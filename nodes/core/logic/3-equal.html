@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    RED.nodes.registerType('equal',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: { value:"==" },
+            check: {value: false}
+        },
+        inputs:2,
+        outputs:1,
+        icon: "light.png",
+        label: function() {
+            return this.name || "equal";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="equal">
+    <div class="form-row">
+        <div class="form-row">
+            <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+            <input type="text" id="node-input-name" placeholder="Name" value="==">
+        </div>
+
+        <input type="hidden" id="node-input-check" value="false">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="equal">
+    <p>A equal</p>
+</script>
+
