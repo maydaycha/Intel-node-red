@@ -1537,7 +1537,7 @@ RED.view = (function() {
                 if (typeof data.success != 'undefined' && data.success == true) {
                     alert('deloy success!')
 
-                    // location.reload()
+                    location.reload()
 
                 } else {
                     alert('deloy fail!')

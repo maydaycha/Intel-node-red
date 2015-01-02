@@ -26,6 +26,7 @@ var localfilesystem = require("./storage/localfilesystem");
 var fs = require('fs');
 var exec = require('child_process').exec;
 var crypto = require('crypto');
+var requestJson = require('request-json');
 
 var app = null;
 var nodeApp = null;
@@ -145,9 +146,9 @@ function createServer(_server,_settings) {
         });
     });
 
-    app.post("/fireMapper", express.json(), function (req, res) {
+    app.post("/fireMapper", express.json(), function (request, response) {
         var fileName = localfilesystem.getSaveFlowFilePath();
-        var data = req.body;
+        var data = request.body;
 
         console.log(data);
 
@@ -169,41 +170,29 @@ function createServer(_server,_settings) {
             fs.writeFile("result1.json", JSON.stringify(data), function(err) {
                 if (err) cosole.log(err);
 
-                exec('cat result1.json', function(error, stdout, stderr) {
-                    var type = "application/json";
-                    var returnJson = false;
-                    var data = JSON.parse(stdout);
+                /** Call Mapper servelt */
+                var client = requestJson.newClient('http://localhost:8080');
+                client.post("/Mapper-Servlet/Mappers", data, function (err, res, body) {
+                    if (!err && res.statusCode == 200) {
+                        console.log('get response');
+                        console.log(body);
 
-                    console.log("red/server.js line 171");
-
-                    returnJson = (type.length >= req.get("accept").length) ? (type.indexOf(req.get("accept")) > -1) : (req.get("accept").indexOf(type) > -1);
-
-                    console.log(data.flow);
-
-                    /* save the original tab object */
-                    for (var i in oriData) {
-                        if (oriData[i].type == "tab")
-                            data.flow.push(oriData[i])
-                    }
-
-                    /** write to flow config file */
-                    fs.writeFile(fileName, JSON.stringify(data.flow), function (err) {
-                        if (err) throw err;
-                        console.log("write file success@@@@");
-                        console.log("==========================");
-                        console.log(data);
-                        console.log("==========================");
-
-                        data.success = true;
-
-                        if (returnJson) {
-                            console.log('return json result');
-                            return res.json(data);
-                        } else {
-                            console.log('return normal resutl');
-                            return res.send(data);
+                        /* save the original tab object */
+                        for (var i in oriData) {
+                            if (oriData[i].type == "tab")
+                                data.flow.push(oriData[i])
                         }
-                    })
+
+                        /** write to flow config file */
+                        fs.writeFile(fileName, JSON.stringify(data.flow), function (err) {
+                            if (err) throw err;
+                            console.log("==========================");
+                            console.log(data);
+                            console.log("==========================");
+                            data.success = true;
+                            return response.json(data);
+                        });
+                    }
                 });
             });
         });
