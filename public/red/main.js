@@ -122,9 +122,36 @@ var RED = (function() {
     }
 
     $('#btn-deploy').click(function() {
+        RED.view.selectAll();
         save();
         console.log(RED.view);
         RED.view.showExportNodesDialog();
+    });
+
+    $("#btn-undeploy").click( function () {
+        RED.view.selectAll();
+        // var nns = RED.nodes.createCompleteNodeSet();
+        // console.log(nns);
+        var data = RED.view.getDesignFlow();
+
+        console.log(data);
+
+        if (typeof data != "undefined") {
+            var params = {"session_id" : data[0].z};
+            console.log(params);
+            $.ajax({
+                url: "/undeploy",
+                method: "delete",
+                data: JSON.stringify(params),
+                headers: {
+                    "Accept" : "application/json; charset=utf-8",
+                    "Content-Type" : "application/json; charset=utf-8"
+                },
+                success: function(data) {
+                    console.log(data);
+                }
+            });
+        }
     });
 
     $( "#node-dialog-confirm-deploy" ).dialog({

@@ -130,29 +130,15 @@ function createServer(_server,_settings) {
         }
     });
 
-    app.get("/fireMapper",  function(req, res) {
-        var fileName = localfilesystem.getSaveFlowFilePath();
 
-        fs.readFile(fileName, "utf8", function (err, oriData) {
-            console.log(oriData);
-
-            oriData = JSON.parse(oriData);
-
-            for (var i in oriData) {
-                if (typeof oriData[i].deviceName != 'undefined') oriData[i].deviceName = "Devise" + i;
-            }
-            res.json(oriData);
-
-        });
-    });
-
-    app.post("/fireMapper", express.json(), function (request, response) {
+    app.post("/deploy", express.json(), function (request, response) {
         var fileName = localfilesystem.getSaveFlowFilePath();
         var data = request.body;
 
-        console.log(data);
+        // var uuid = genUuid(null);
 
-        var uuid = genUuid(null);
+        // get uniqure session id from object z attribute ( equals to tab id)
+        var uuid = data.flow[0].z
 
         console.log("uuid: " + uuid);
 
@@ -177,24 +163,54 @@ function createServer(_server,_settings) {
                         console.log('get response');
                         console.log(body);
 
-                        /* save the original tab object */
                         for (var i in oriData) {
-                            if (oriData[i].type == "tab")
-                                data.flow.push(oriData[i])
+                            for (var j in body.flow) {
+                                if (oriData[i].id == body.flow[j].id)
+                                    oriData[i] = body.flow[j]
+                            }
+
+                            if (oriData[i].type == "tab" && oriData[i].id == body.flow[0].z) {
+                                oriData[i].deploy = true
+                            }
                         }
 
-                        /** write to flow config file */
-                        fs.writeFile(fileName, JSON.stringify(data.flow), function (err) {
+                        // /** write to flow config file */
+                        fs.writeFile(fileName, JSON.stringify(oriData), function (err) {
                             if (err) throw err;
-                            console.log("==========================");
-                            console.log(data);
-                            console.log("==========================");
+                            console.log("=============");
+                            console.log(oriData);
+                            console.log("=============");
                             data.success = true;
                             return response.json(data);
                         });
                     }
                 });
             });
+        });
+    });
+
+    app.delete("/undeploy", express.json(), function (request, response) {
+        var fileName = localfilesystem.getSaveFlowFilePath();
+
+        var data = request.body;
+
+        var client = requestJson.newClient('http://localhost:8080');
+
+        client.del("/Mapper-Servlet/Mappers/" + data.session_id, null, function (err, res, body) {
+            if (!err && res.statusCode == 200) {
+                fs.readFile(fileName, "utf8", function (err, oriData) {
+                    oriData = JSON.parse(oriData);
+                    for (var i in oriData) {
+                        if (oriData[i].type == "tab" && oriData[i].id == data.session_id) {
+                            oriData[i].deploy = false;
+                        }
+                    }
+                    fs.writeFile(fileName, JSON.stringify(oriData), function (err) {
+                        response.json(request.body);
+                        response.end();
+                    });
+                });
+            }
         });
     });
 

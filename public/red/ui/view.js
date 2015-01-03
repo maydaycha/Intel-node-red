@@ -1402,7 +1402,7 @@ RED.view = (function() {
     }
 
     RED.keyboard.add(/* z */ 90,{ctrl:true},function(){RED.history.pop();});
-    RED.keyboard.add(/* a */ 65,{ctrl:true},function(){selectAll();d3.event.preventDefault();});
+    RED.keyboard.add(/* a */ 65,{ctrl:true},function(){selectAll(); d3.event.preventDefault();});
     RED.keyboard.add(/* = */ 187,{ctrl:true},function(){zoomIn();d3.event.preventDefault();});
     RED.keyboard.add(/* - */ 189,{ctrl:true},function(){zoomOut();d3.event.preventDefault();});
     RED.keyboard.add(/* 0 */ 48,{ctrl:true},function(){zoomZero();d3.event.preventDefault();});
@@ -1521,9 +1521,9 @@ RED.view = (function() {
         }
 
         console.log(params);
-        /* send request to /fireMapper to fire Mapper for discovery */
+        /* send request to /deploy to fire Mapper for discovery */
         $.ajax({
-            url: "/fireMapper",
+            url: "/deploy",
             method: "post",
             data: JSON.stringify(params),
             headers: {
@@ -1537,13 +1537,21 @@ RED.view = (function() {
                 if (typeof data.success != 'undefined' && data.success == true) {
                     alert('deloy success!')
 
-                    location.reload()
+                    // location.reload()
 
                 } else {
                     alert('deloy fail!')
                 }
             }
         });
+    }
+
+    function getDesignFlow() {
+        mouse_mode = RED.state.EXPORT;
+        var nns = RED.nodes.createExportableNodeSet(moving_set);
+        $("#dialog-form").html($("script[data-template-name='export-clipboard-dialog']").html());
+        $("#node-input-export").val(JSON.stringify(nns));
+        return nns
     }
 
     function showExportNodesLibraryDialog() {
@@ -1699,7 +1707,10 @@ RED.view = (function() {
             //TODO: subscribe/unsubscribe here
             redraw();
         },
-        showExportNodesDialog: showExportNodesDialog
+        showExportNodesDialog: showExportNodesDialog,
+        selectAll: selectAll,
+        getDesignFlow: getDesignFlow
+
 
     };
 })();

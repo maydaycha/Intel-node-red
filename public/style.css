@@ -30,7 +30,7 @@ body {
     display: none;
 }
 #dropTarget div {
-    display: table-cell; 
+    display: table-cell;
     vertical-align: middle;
     text-align: center;
     font-size: 40px;
@@ -121,7 +121,7 @@ a.brand img {
     padding: 5px;
     overflow-y: auto;
     box-sizing:border-box;
-    -moz-box-sizing: border-box;    
+    -moz-box-sizing: border-box;
 }
 .palette-spinner {
     padding-top: 40px;
@@ -139,7 +139,7 @@ a.brand img {
     padding: 3px;
     border-top: 1px solid #999;
     box-sizing:border-box;
-    -moz-box-sizing: border-box;    
+    -moz-box-sizing: border-box;
 }
 #palette-search i.icon-search {
     position: absolute;
@@ -167,8 +167,8 @@ a.brand img {
     margin: 0px;
     height: 30px;
     box-sizing:border-box;
-    -moz-box-sizing: border-box;    
-    
+    -moz-box-sizing: border-box;
+
 }
 #palette-search input:focus {
     border: none;
@@ -214,6 +214,7 @@ a.brand img {
 .palette_label {
    line-height: 25px;
    text-align: center;
+   overflow: hidden;
 
 }
 .palette_node {
@@ -239,7 +240,7 @@ a.brand img {
    top:8px;
    left: -5px;
    box-sizing: border-box;
-    -moz-box-sizing: border-box;    
+    -moz-box-sizing: border-box;
    background:#d9d9d9;
    border-radius: 3px;
    width: 10px;
@@ -258,7 +259,7 @@ a.brand img {
 #sidebar {
     background: #fff;
     box-sizing: border-box;
-    -moz-box-sizing: border-box;    
+    -moz-box-sizing: border-box;
 }
 #sidebar.closing {
     background: #eee;
@@ -763,7 +764,7 @@ ul.red-ui-tabs li {
 }
 
 ul.red-ui-tabs li a.red-ui-tab-label {
-    display: block; 
+    display: block;
     padding: 3px 16px;
     color: #666;
 }
@@ -876,6 +877,6 @@ i.spinner {
     background: url(spin.svg) no-repeat 50% 50%;
     background-size: contain
 }
-    
-    
+
+
 
