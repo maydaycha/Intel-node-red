@@ -13,33 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
- 
+
 
 
 RED.tabs = (function() {
-    
-    
+
+
     function createTabs(options) {
         var tabs = {};
-        
+        console.log(options)
         var ul = $("#"+options.id)
         ul.addClass("red-ui-tabs");
         ul.children().first().addClass("active");
         ul.children().addClass("red-ui-tab");
-        
+
         function onTabClick() {
             activateTab($(this));
             return false;
         }
-        
+
         function onTabDblClick() {
             if (options.ondblclick) {
                 options.ondblclick(tabs[$(this).attr('href').slice(1)]);
             }
             return false;
         }
-        
+
         function activateTab(link) {
+            console.log(link)
             if (typeof link === "string") {
                 link = ul.find("a[href='#"+link+"']");
             }
@@ -51,7 +52,7 @@ RED.tabs = (function() {
                 }
             }
         }
-        
+
         function updateTabWidths() {
             var tabs = ul.find("li.red-ui-tab");
             var width = ul.width();
@@ -60,11 +61,11 @@ RED.tabs = (function() {
             var pct = 100*tabWidth/width;
             tabs.css({width:pct+"%"});
         }
-        
+
         ul.find("li.red-ui-tab a").on("click",onTabClick).on("dblclick",onTabDblClick);
         updateTabWidths();
-        
-        
+
+
         function removeTab(id) {
             var li = ul.find("a[href='#"+id+"']").parent();
             if (li.hasClass("active")) {
@@ -81,20 +82,29 @@ RED.tabs = (function() {
             delete tabs[id];
             updateTabWidths();
         }
-        
+
         return {
             addTab: function(tab) {
+                console.log(tab)
                 tabs[tab.id] = tab;
                 var li = $("<li/>",{class:"red-ui-tab"}).appendTo(ul);
                 var link = $("<a/>",{href:"#"+tab.id, class:"red-ui-tab-label"}).appendTo(li);
-                link.html(tab.label);
-                
+
+                /** Added By Yao-Ching
+                  * add deploy status to label
+                  */
+                if (typeof tab.deploy != "undefined" && tab.deploy) {
+                    link.html(tab.label + " deployed");
+                } else {
+                    link.html(tab.label + " undeploy");
+                }
+
                 link.on("click",onTabClick);
                 link.on("dblclick",onTabDblClick);
                 if (tab.closeable) {
                     var closeLink = $("<a/>",{href:"#",class:"red-ui-tab-close"}).appendTo(li);
                     closeLink.html('<i class="icon-remove" />');
-                    
+
                     closeLink.on("click",function(event) {
                         removeTab(tab.id);
                     });
@@ -120,7 +130,7 @@ RED.tabs = (function() {
 
         }
     }
-    
+
     return {
         create: createTabs
     }

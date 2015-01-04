@@ -149,6 +149,7 @@ var RED = (function() {
                 },
                 success: function(data) {
                     console.log(data);
+                    location.reload()
                 }
             });
         }
