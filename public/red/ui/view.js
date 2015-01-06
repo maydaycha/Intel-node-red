@@ -1530,10 +1530,13 @@ RED.view = (function() {
                 "Accept" : "application/json; charset=utf-8",
                 "Content-Type" : "application/json; charset=utf-8"
             },
-            success: function(data) {
+            success: function (data) {
                 console.log("requeqst succes!");
                 console.log(data);
                 console.log(data.success);
+
+                document.getElementById("849202ad.7b6e").firstChild.style.stroke = "red";
+
                 if (typeof data.success != 'undefined' && data.success == true) {
                     alert('deloy success!')
 
@@ -1542,6 +1545,9 @@ RED.view = (function() {
                 } else {
                     alert('deloy fail!')
                 }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert('deloy fail!')
             }
         });
     }

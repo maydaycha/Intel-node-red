@@ -22,6 +22,8 @@ var nopt = require("nopt");
 var path = require("path");
 var RED = require("./red/red.js");
 
+var io = require('socket.io');
+
 var server;
 var app = express();
 
@@ -175,12 +177,26 @@ RED.start().then(function() {
             }
             process.exit(1);
         });
+        /** establish the websocket */
+        // io = io(server)
+        // io.on('connection', function (socket) {
+        //     socket.on('event', function (data) { console.log(data) });
+        //     socket.on('disconnect', function() { console.log("disconnect")});
+        // })
+
         server.listen(settings.uiPort,settings.uiHost,function() {
             if (settings.httpAdminRoot === false) {
                 util.log('[red] Admin UI disabled');
             }
             util.log('[red] Server now running at '+getListenPath());
         });
+
+        util.log("io socket")
+        var serv_io = io.listen(server);
+        serv_io.sockets.on('connection', function(socket) {
+             socket.emit('message', {'message': 'hello world'});
+        });
+
     } else {
         util.log('[red] Running in headless mode');
     }
@@ -199,6 +215,6 @@ process.on('uncaughtException',function(err) {
 process.on('SIGINT', function () {
     RED.stop();
     // TODO: need to allow nodes to close asynchronously before terminating the
-    // process - ie, promises 
+    // process - ie, promises
     process.exit();
 });

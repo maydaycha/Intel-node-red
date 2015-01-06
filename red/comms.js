@@ -16,6 +16,7 @@
 
 var ws = require("ws");
 var util = require("util");
+var pathe = require('path');
 
 var server;
 var settings;
@@ -40,7 +41,7 @@ function start() {
     var path = settings.httpAdminRoot || "/";
     path = path + (path.slice(-1) == "/" ? "":"/") + "comms";
     wsServer = new ws.Server({server:server,path:path});
-    
+
     wsServer.on('connection',function(ws) {
         activeConnections.push(ws);
         ws.on('close',function() {
@@ -55,6 +56,7 @@ function start() {
             var msg = null;
             try {
                 msg = JSON.parse(data);
+                console.log(msg);
             } catch(err) {
                 util.log("[red:comms] received malformed message : "+err.toString());
                 return;
@@ -67,13 +69,13 @@ function start() {
             util.log("[red:comms] error : "+err.toString());
         });
     });
-    
+
     wsServer.on('error', function(err) {
         util.log("[red:comms] server error : "+err.toString());
     });
-     
+
     lastSentTime = Date.now();
-    
+
     heartbeatTimer = setInterval(function() {
         var now = Date.now();
         if (now-lastSentTime > webSocketKeepAliveTime) {
@@ -118,9 +120,10 @@ function handleRemoteSubscription(ws,topic) {
 }
 
 
+
 module.exports = {
     init:init,
     start:start,
     stop:stop,
-    publish:publish,
+    publish:publish
 }

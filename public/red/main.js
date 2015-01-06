@@ -121,6 +121,13 @@ var RED = (function() {
         }
     }
 
+    $("#btn-discovery").click(function () {
+        RED.view.selectAll();
+        save();
+        console.log(RED.view);
+        RED.view.showExportNodesDialog();
+    })
+
     $('#btn-deploy').click(function() {
         RED.view.selectAll();
         save();
@@ -134,7 +141,10 @@ var RED = (function() {
         // console.log(nns);
         var data = RED.view.getDesignFlow();
 
+        console.log('get desginData');
         console.log(data);
+
+        return;
 
         if (typeof data != "undefined") {
             var params = {"session_id" : data[0].z};

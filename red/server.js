@@ -27,6 +27,8 @@ var fs = require('fs');
 var exec = require('child_process').exec;
 var crypto = require('crypto');
 var requestJson = require('request-json');
+var mqtt = require('mqtt');
+
 
 var app = null;
 var nodeApp = null;
@@ -177,12 +179,32 @@ function createServer(_server,_settings) {
                         // /** write to flow config file */
                         fs.writeFile(fileName, JSON.stringify(oriData), function (err) {
                             if (err) throw err;
+
+                            var mqttClient = mqtt.createClient(1883, 'localhost');
+
+                            var topic = "/formosa/" + uuid + "/topic_name"
+
+                            mqttClient.subscribe(topic)
+
+                            console.log("mqtt sub topic: " + topic)
+
+                            mqttClient.on('message', function (topic, message) {
+                                console.log('got message!')
+                                console.log(message)
+                            })
+
+                            // var websocket = comms.getWebsocket();
+
+                            // webSocket.send("!!!!@@@ Maydaycha");
+
                             console.log("=============");
                             console.log(oriData);
                             console.log("=============");
                             data.success = true;
                             return response.json(data);
                         });
+                    } else {
+                        response.send(404);
                     }
                 });
             });
@@ -212,6 +234,11 @@ function createServer(_server,_settings) {
                 });
             }
         });
+    });
+
+    app.get("/socket", function(reqeust, response) {
+        var webSocket = comms.getWebSocket();
+        webSocket.send("!!!!@@@ Maydaycha");
     });
 
 }

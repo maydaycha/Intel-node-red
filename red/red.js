@@ -33,20 +33,20 @@ var RED = {
 
     init: function(httpServer,userSettings) {
         settings = userSettings;
-        
+
         var p = require(path.join(process.env.NODE_RED_HOME,"package.json"));
         if (fs.existsSync(path.join(process.env.NODE_RED_HOME,".git"))) {
             settings.version = p.version+".git";
         } else {
             settings.version = p.version;
         }
-        
-        
+
+
         server.init(httpServer,settings);
         library.init();
         return server.app;
     },
-    
+
     start: server.start,
     stop: server.stop,
     nodes: nodes,
@@ -54,7 +54,7 @@ var RED = {
     credentials: credentials,
     events: events,
     log: log,
-    comms:comms
+    comms: comms
 };
 
 RED.__defineGetter__("app", function() { console.log("Deprecated use of RED.app - use RED.httpAdmin instead"); return server.app });
