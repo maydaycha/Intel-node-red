@@ -28,6 +28,7 @@ var exec = require('child_process').exec;
 var crypto = require('crypto');
 var requestJson = require('request-json');
 var mqtt = require('mqtt');
+var WebSocketServer = require('ws').Server
 
 
 var app = null;
@@ -36,6 +37,8 @@ var server = null;
 var settings = null;
 var storage = null;
 
+var wss = null;
+
 function createServer(_server,_settings) {
     server = _server;
     settings = _settings;
@@ -43,6 +46,7 @@ function createServer(_server,_settings) {
     storage = require("./storage");
     app = createUI(settings);
     nodeApp = express();
+
 
     app.get("/nodes",function(req,res) {
         res.send(redNodes.getNodeConfigs());
@@ -165,34 +169,47 @@ function createServer(_server,_settings) {
                         console.log('get response');
                         console.log(body);
 
+                        var mqttClient = mqtt.createClient(1883, 'localhost');
+                        var topicPrefix = "/formosa/" + uuid + "/"
+
                         for (var i in oriData) {
                             for (var j in body.flow) {
-                                if (oriData[i].id == body.flow[j].id)
+                                if (oriData[i].id == body.flow[j].id) {
                                     oriData[i] = body.flow[j]
+
+                                    /** subscribe the topic for each node */
+                                    var topic = topicPrefix + body.flow[j].id
+                                    mqttClient.subscribe(topic)
+                                    console.log("mqtt sub topic: " + topic)
+                                }
                             }
 
                             if (oriData[i].type == "tab" && oriData[i].id == body.flow[0].z) {
                                 oriData[i].deploy = true
                             }
                         }
+                        if (wss === null) wss = new WebSocketServer({ port: 5566 });
+                        data.webSocket = "ws://localhost:" + 5566;
+                        /** websocket handler */
+                        wss.on('connection', function connection(ws) {
+                            ws.on('message', function incoming(message) {
+                                console.log('received: %s', message);
+                            });
+                            // ws.send('something');
 
-                        // /** write to flow config file */
-                        fs.writeFile(fileName, JSON.stringify(oriData), function (err) {
-                            if (err) throw err;
-
-                            var mqttClient = mqtt.createClient(1883, 'localhost');
-
-                            var topic = "/formosa/" + uuid + "/topic_name"
-
-                            mqttClient.subscribe(topic)
-
-                            console.log("mqtt sub topic: " + topic)
-
+                            /** message arrive handler */
                             mqttClient.on('message', function (topic, message) {
                                 console.log('got message!')
-                                console.log(message)
+                                console.log("topic: " + topic + "; message: " + message)
+                                var splitArray = topic.split("/")
+                                var nodeId = splitArray[splitArray.length - 1]
+                                ws.send(nodeId);
                             })
+                        });
 
+                        /** write to flow config file */
+                        fs.writeFile(fileName, JSON.stringify(oriData), function (err) {
+                            if (err) throw err;
                             // var websocket = comms.getWebsocket();
 
                             // webSocket.send("!!!!@@@ Maydaycha");
@@ -203,6 +220,7 @@ function createServer(_server,_settings) {
                             data.success = true;
                             return response.json(data);
                         });
+
                     } else {
                         response.send(404);
                     }

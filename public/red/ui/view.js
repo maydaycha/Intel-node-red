@@ -1534,9 +1534,27 @@ RED.view = (function() {
                 console.log("requeqst succes!");
                 console.log(data);
 
-                for (var i in data.flow) {
-                    document.getElementById(data.flow[i].id).firstChild.style.stroke = "blue";
+                var nodeIdArray = []
+                for ( var i in data.flow) {
+                    nodeIdArray.push(data.flow[i].id)
                 }
+
+                socketClient = new WebSocket(data.webSocket);
+
+                socketClient.onmessage = function (event) {
+                    console.log(event)
+                    for (var i in nodeIdArray) {
+                        if (nodeIdArray[i] == event.data) {
+                            document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "blue";
+                        } else {
+                            document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "#999";
+                        }
+                    }
+                }
+
+                // for (var i in data.flow) {
+                //     document.getElementById(data.flow[i].id).firstChild.style.stroke = "blue";
+                // }
 
                 if (typeof data.success != 'undefined' && data.success == true) {
                     alert('deloy success!')
