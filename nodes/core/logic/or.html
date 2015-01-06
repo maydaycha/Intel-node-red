@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Or',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: { value:"Or" },
+            check: {value: false}
+        },
+        inputs:1,
+        outputs:2,
+        icon: "light.png",
+        label: function() {
+            return this.name || "Or";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Or">
+    <div class="form-row">
+        <div class="form-row">
+            <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+            <input type="text" id="node-input-name" placeholder="Name" value="==">
+        </div>
+
+        <input type="hidden" id="node-input-check" value="false">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="Or">
+    <p>A or</p>
+</script>
+

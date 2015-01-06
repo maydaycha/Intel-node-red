@@ -1533,9 +1533,10 @@ RED.view = (function() {
             success: function (data) {
                 console.log("requeqst succes!");
                 console.log(data);
-                console.log(data.success);
 
-                document.getElementById("849202ad.7b6e").firstChild.style.stroke = "red";
+                for (var i in data.flow) {
+                    document.getElementById(data.flow[i].id).firstChild.style.stroke = "blue";
+                }
 
                 if (typeof data.success != 'undefined' && data.success == true) {
                     alert('deloy success!')
@@ -1565,7 +1566,7 @@ RED.view = (function() {
         var nns = RED.nodes.createExportableNodeSet(moving_set);
         $("#dialog-form").html($("script[data-template-name='export-library-dialog']").html());
         $("#node-input-filename").attr('nodes',JSON.stringify(nns));
-        $( "#dialog" ).dialog("option","title","Export nodes to library").dialog( "open" );
+        $("#dialog").dialog("option","title","Export nodes to library").dialog("open");
     }
 
     function showImportNodesDialog() {

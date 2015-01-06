@@ -1,0 +1,39 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Number',{
+        category: 'input',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value: ""},
+            value: {value: 0},
+            check: {value: false}
+        },
+        inputs:1,
+        outputs:0,
+        icon: "bridge.png",
+        label: function() {
+            return this.name || "Number";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Number">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-value"><i class="icon-tag"></i> Value</label>
+        <input type="text" id="node-input-value" placeholder="Number">
+    </div>
+
+
+    <!-- /** for mapper to identified if need to fire discovey */-->
+    <input type="hidden" id="node-input-check" hidden>
+
+</script>
+
+<script type="text/x-red" data-help-name="Number">
+    <p>A value sensor</p>
+</script>
+

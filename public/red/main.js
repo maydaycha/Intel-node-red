@@ -121,12 +121,12 @@ var RED = (function() {
         }
     }
 
-    $("#btn-discovery").click(function () {
-        RED.view.selectAll();
-        save();
-        console.log(RED.view);
-        RED.view.showExportNodesDialog();
-    })
+    // $("#btn-discovery").click(function () {
+    //     RED.view.selectAll();
+    //     save();
+    //     console.log(RED.view);
+    //     RED.view.showExportNodesDialog();
+    // })
 
     $('#btn-deploy').click(function() {
         RED.view.selectAll();
@@ -144,7 +144,7 @@ var RED = (function() {
         console.log('get desginData');
         console.log(data);
 
-        return;
+        // return;
 
         if (typeof data != "undefined") {
             var params = {"session_id" : data[0].z};
