@@ -189,7 +189,7 @@ function createServer(_server,_settings) {
                             }
                         }
                         if (wss === null) wss = new WebSocketServer({ port: 5566 });
-                        data.webSocket = "ws://localhost:" + 5566;
+                        body.webSocket = "ws://localhost:" + 5566;
                         /** websocket handler */
                         wss.on('connection', function connection(ws) {
                             ws.on('message', function incoming(message) {
@@ -217,8 +217,8 @@ function createServer(_server,_settings) {
                             console.log("=============");
                             console.log(oriData);
                             console.log("=============");
-                            data.success = true;
-                            return response.json(data);
+
+                            return response.json(body);
                         });
 
                     } else {

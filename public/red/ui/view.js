@@ -1496,78 +1496,94 @@ RED.view = (function() {
     $('#btn-export-library').click(function() {showExportNodesLibraryDialog();});
 
     function showExportNodesDialog() {
-        mouse_mode = RED.state.EXPORT;
-        var nns = RED.nodes.createExportableNodeSet(moving_set);
-        $("#dialog-form").html($("script[data-template-name='export-clipboard-dialog']").html());
-        $("#node-input-export").val(JSON.stringify(nns));
-        console.log(JSON.stringify(nns));
-        $("#node-input-export").focus(function() {
-                var textarea = $(this);
-                textarea.select();
-                textarea.mouseup(function() {
-                        textarea.unbind("mouseup");
-                        return false;
-                });
+        $("#ex7").modal({
+            fadeDuration: 500,
+            fadeDelay: 0.50,
+            escapeClose: true
         });
-        $( "#dialog" ).dialog("option","title","Export nodes to clipboard").dialog( "open" );
-        $("#node-input-export").focus();
 
+        $("#ex7").on($.modal.CLOSE, function(event, modal) {
+            console.log("clise1");
+            // alert("success")
+        });
 
+        $("#ex7").on($.modal.OPEN, function(event, modal) {
+            mouse_mode = RED.state.EXPORT;
+            var nns = RED.nodes.createExportableNodeSet(moving_set);
+            $("#dialog-form").html($("script[data-template-name='export-clipboard-dialog']").html());
+            $("#node-input-export").val(JSON.stringify(nns));
+            console.log(JSON.stringify(nns));
 
-        /* construct JSON object for mapper */
-        var params = {
-            type: "req",
-            flow: nns
-        }
+            // $("#node-input-export").focus(function() {
+            //         var textarea = $(this);
+            //         textarea.select();
+            //         textarea.mouseup(function() {
+            //                 textarea.unbind("mouseup");
+            //                 return false;
+            //         });
+            // });
+            // $( "#dialog" ).dialog("option","title","Export nodes to clipboard").dialog( "open" );
+            // $("#node-input-export").focus();
 
-        console.log(params);
-        /* send request to /deploy to fire Mapper for discovery */
-        $.ajax({
-            url: "/deploy",
-            method: "post",
-            data: JSON.stringify(params),
-            headers: {
-                "Accept" : "application/json; charset=utf-8",
-                "Content-Type" : "application/json; charset=utf-8"
-            },
-            success: function (data) {
-                console.log("requeqst succes!");
-                console.log(data);
-
-                var nodeIdArray = []
-                for ( var i in data.flow) {
-                    nodeIdArray.push(data.flow[i].id)
-                }
-
-                socketClient = new WebSocket(data.webSocket);
-
-                socketClient.onmessage = function (event) {
-                    console.log(event)
-                    for (var i in nodeIdArray) {
-                        if (nodeIdArray[i] == event.data) {
-                            document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "blue";
-                        } else {
-                            document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "#999";
-                        }
-                    }
-                }
-
-                // for (var i in data.flow) {
-                //     document.getElementById(data.flow[i].id).firstChild.style.stroke = "blue";
-                // }
-
-                if (typeof data.success != 'undefined' && data.success == true) {
-                    alert('deloy success!')
-
-                    // location.reload()
-
-                } else {
-                    alert('deloy fail!')
-                }
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                alert('deloy fail!')
+            /* construct JSON object for mapper */
+            var params = {
+                type: "req",
+                flow: nns
             }
+
+            console.log(params);
+
+
+            /* send request to /deploy to fire Mapper for discovery */
+            $.ajax({
+                url: "/deploy",
+                method: "post",
+                data: JSON.stringify(params),
+                headers: {
+                    "Accept" : "application/json; charset=utf-8",
+                    "Content-Type" : "application/json; charset=utf-8"
+                },
+                success: function (data) {
+                    console.log("get request data!");
+                    console.log(data);
+
+                    if (typeof data.success == 'undefined' || data.success == false) {
+                        console.log('deloy fail! Will try agian in 5 sec')
+                        setTimeout(showExportNodesDialog, 5000);
+                    } else {
+                        /** store node id for color changing */
+                        var nodeIdArray = []
+                        for ( var i in data.flow) {
+                            nodeIdArray.push(data.flow[i].id)
+                        }
+
+                        socketClient = new WebSocket(data.webSocket);
+
+                        socketClient.onmessage = function (event) {
+                            console.log(event)
+                            for (var i in nodeIdArray) {
+                                if (nodeIdArray[i] == event.data) {
+                                    document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "blue";
+                                } else {
+                                    /* reset other nodes that are not working currently */
+                                    document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "#999";
+                                }
+                            }
+                        }
+                        setTimeout(function() {
+                            var oriText = $("#ex7 p").text()
+                            $("#ex7 p").html("Success!!")
+                            setTimeout( function () {
+                                location.reload()
+                            }, 1000)
+                        }, 3000);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Http request fail !')
+                    console.log(errorThrown)
+                }
+            });
         });
     }
 

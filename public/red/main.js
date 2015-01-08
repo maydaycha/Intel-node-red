@@ -129,6 +129,11 @@ var RED = (function() {
     // })
 
     $('#btn-deploy').click(function() {
+        $("#ex7").modal({
+            fadeDuration: 1000,
+            fadeDelay: 0.50
+        });
+
         RED.view.selectAll();
         save();
         console.log(RED.view);
