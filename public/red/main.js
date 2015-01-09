@@ -129,10 +129,7 @@ var RED = (function() {
     // })
 
     $('#btn-deploy').click(function() {
-        $("#ex7").modal({
-            fadeDuration: 1000,
-            fadeDelay: 0.50
-        });
+
 
         RED.view.selectAll();
         save();
@@ -212,6 +209,8 @@ var RED = (function() {
 
     function loadFlows() {
         $.getJSON("flows",function(nodes) {
+            console.log("flows");
+            console.log(nodes)
             RED.nodes.import(nodes);
             RED.view.dirty(false);
             RED.view.redraw();
@@ -248,7 +247,43 @@ var RED = (function() {
                     }
                 }
             });
+
+            setUpWebSocket()
+
         });
+
+    }
+
+    function setUpWebSocket () {
+        var socketClient = new WebSocket("ws://localhost:5566");
+        var nodeIds = [];
+
+        socketClient.onopen = function (event) {
+            console.log("connect sokcet")
+            socketClient.send('start flag')
+        }
+        socketClient.onclose = function (event) {
+            console.log('socket disconnected')
+        }
+        socketClient.onmessage = function (event) {
+
+            /** if node id is not be persistence, store it */
+            if (nodeIds.indexOf(event.data) == -1) {
+                nodeIds.push(event.data);
+            }
+            /** change the color of node which is acting currently */
+            for (var i in nodeIds) {
+                if (nodeIds[i] == event.data) {
+                    if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "blue";
+                } else {
+                    if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "#999";
+                }
+            }
+            console.log(event)
+        }
+        socketClient.onerror = function (event) {
+            console.log('socket error')
+        }
     }
 
     $('#btn-node-status').click(function() {toggleStatus();});

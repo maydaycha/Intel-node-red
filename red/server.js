@@ -38,6 +38,7 @@ var settings = null;
 var storage = null;
 
 var wss = null;
+var mqttClient = null;
 
 function createServer(_server,_settings) {
     server = _server;
@@ -149,8 +150,10 @@ function createServer(_server,_settings) {
         console.log("uuid: " + uuid);
 
         fs.readFile(fileName, "utf8", function (err, oriData) {
-            if (err) throw err;
-            oriData = JSON.parse(oriData);
+            if (err) throw err
+            console.log("read data")
+            console.log(oriData)
+            oriData = JSON.parse(oriData)
 
             /* for testing use */
             for (var i in data.flow) {
@@ -159,72 +162,90 @@ function createServer(_server,_settings) {
 
             data.session_id = uuid;
 
-            fs.writeFile("result1.json", JSON.stringify(data), function(err) {
-                if (err) cosole.log(err);
+            /** Call Mapper servelt */
+            var client = requestJson.newClient('http://localhost:8080');
+            client.post("/Mapper-Servlet/Mappers", data, function (err, res, body) {
+                if (!err && res.statusCode == 200) {
 
-                /** Call Mapper servelt */
-                var client = requestJson.newClient('http://localhost:8080');
-                client.post("/Mapper-Servlet/Mappers", data, function (err, res, body) {
-                    if (!err && res.statusCode == 200) {
-                        console.log('get response');
-                        console.log(body);
+                    console.log('get response');
+                    console.log(body);
 
-                        var mqttClient = mqtt.createClient(1883, 'localhost');
-                        var topicPrefix = "/formosa/" + uuid + "/"
+                    if (body.success == false) {
+                        return response.send(body);
+                    }
 
-                        for (var i in oriData) {
-                            for (var j in body.flow) {
-                                if (oriData[i].id == body.flow[j].id) {
-                                    oriData[i] = body.flow[j]
+                    if (mqttClient == null) {
+                        mqttClient = mqtt.createClient(1883, 'localhost');
+                    }
+                    var topicPrefix = "/formosa/" + uuid + "/"
 
-                                    /** subscribe the topic for each node */
-                                    var topic = topicPrefix + body.flow[j].id
-                                    mqttClient.subscribe(topic)
-                                    console.log("mqtt sub topic: " + topic)
-                                }
-                            }
+                    for (var i in oriData) {
+                        for (var j in body.flow) {
+                            if (oriData[i].id == body.flow[j].id) {
+                                oriData[i] = body.flow[j]
 
-                            if (oriData[i].type == "tab" && oriData[i].id == body.flow[0].z) {
-                                oriData[i].deploy = true
+                                /** subscribe the topic for each node */
+                                var topic = topicPrefix + body.flow[j].id
+                                mqttClient.subscribe(topic)
+                                console.log("mqtt sub topic: " + topic)
                             }
                         }
-                        if (wss === null) wss = new WebSocketServer({ port: 5566 });
-                        body.webSocket = "ws://localhost:" + 5566;
-                        /** websocket handler */
-                        wss.on('connection', function connection(ws) {
-                            ws.on('message', function incoming(message) {
-                                console.log('received: %s', message);
-                            });
-                            // ws.send('something');
 
+                        if (oriData[i].type == "tab" && oriData[i].id == body.flow[0].z) {
+                            oriData[i].deploy = true
+                        }
+                    }
+                    if (wss === null) wss = new WebSocketServer({ port: 5566 });
+                    body.webSocket = "ws://localhost:" + 5566;
+                    /** websocket handler */
+                    wss.on('connection', function connection(ws) {
+                        ws.on('message', function incoming(message) {
+                            console.log('received: %s', message);
+                            // ws.close()
                             /** message arrive handler */
                             mqttClient.on('message', function (topic, message) {
-                                console.log('got message!')
+                                // console.log('got message!')
                                 console.log("topic: " + topic + "; message: " + message)
                                 var splitArray = topic.split("/")
                                 var nodeId = splitArray[splitArray.length - 1]
-                                ws.send(nodeId);
+
+                                try {
+                                    console.log("[websocket] send: " + nodeId);
+                                    ws.send(nodeId);
+                                } catch (e) {
+                                    console.log('[webSocket] send error: ' + e);
+                                }
                             })
                         });
+                        // ws.send('something');
 
-                        /** write to flow config file */
-                        fs.writeFile(fileName, JSON.stringify(oriData), function (err) {
-                            if (err) throw err;
-                            // var websocket = comms.getWebsocket();
 
-                            // webSocket.send("!!!!@@@ Maydaycha");
 
-                            console.log("=============");
-                            console.log(oriData);
-                            console.log("=============");
-
-                            return response.json(body);
+                        ws.on('close', function close() {
+                            console.log('disconnected');
+                            // ws.close()
                         });
+                    });
 
-                    } else {
-                        response.send(404);
-                    }
-                });
+
+
+                    /** write to flow config file */
+                    fs.writeFile(fileName, JSON.stringify(oriData), function (err) {
+                        if (err) throw err;
+                        // var websocket = comms.getWebsocket();
+
+                        // webSocket.send("!!!!@@@ Maydaycha");
+
+                        console.log("=============");
+                        console.log(oriData);
+                        console.log("=============");
+
+                        return response.json(body);
+                    });
+
+                } else {
+                    response.send(404);
+                }
             });
         });
     });

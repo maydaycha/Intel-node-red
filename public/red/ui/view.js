@@ -1548,28 +1548,33 @@ RED.view = (function() {
                     console.log(data);
 
                     if (typeof data.success == 'undefined' || data.success == false) {
+                        var oriText = $("#ex7 p").text()
                         console.log('deloy fail! Will try agian in 5 sec')
                         setTimeout(showExportNodesDialog, 5000);
+                        $.modal.close()
+                        return;
                     } else {
+
                         /** store node id for color changing */
-                        var nodeIdArray = []
-                        for ( var i in data.flow) {
-                            nodeIdArray.push(data.flow[i].id)
-                        }
+                        // var nodeIdArray = []
+                        // for ( var i in data.flow) {
+                        //     nodeIdArray.push(data.flow[i].id)
+                        // }
 
-                        socketClient = new WebSocket(data.webSocket);
+                        // socketClient = new WebSocket(data.webSocket);
 
-                        socketClient.onmessage = function (event) {
-                            console.log(event)
-                            for (var i in nodeIdArray) {
-                                if (nodeIdArray[i] == event.data) {
-                                    document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "blue";
-                                } else {
-                                    /* reset other nodes that are not working currently */
-                                    document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "#999";
-                                }
-                            }
-                        }
+                        // socketClient.onmessage = function (event) {
+                        //     console.log(event)
+                        //     for (var i in nodeIdArray) {
+                        //         if (nodeIdArray[i] == event.data) {
+                        //             document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "blue";
+                        //         } else {
+                        //             /* reset other nodes that are not working currently */
+                        //             document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "#999";
+                        //         }
+                        //     }
+                        // }
+
                         setTimeout(function() {
                             var oriText = $("#ex7 p").text()
                             $("#ex7 p").html("Success!!")
@@ -1580,7 +1585,8 @@ RED.view = (function() {
                     }
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    alert('Http request fail !')
+                    console.log("Http request fail !")
+                    console.log("statis: " + textStatus);
                     console.log(errorThrown)
                 }
             });
