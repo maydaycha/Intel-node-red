@@ -29,6 +29,7 @@ var crypto = require('crypto');
 var requestJson = require('request-json');
 var mqtt = require('mqtt');
 var WebSocketServer = require('ws').Server
+var querystring = require('querystring')
 
 
 var app = null;
@@ -251,14 +252,24 @@ function createServer(_server,_settings) {
     });
 
     app.delete("/undeploy", express.json(), function (request, response) {
+        console.log('get reqeust')
         var fileName = localfilesystem.getSaveFlowFilePath();
 
         var data = request.body;
 
+        /** trick for pass params who has "."" */
+        data.session_id = data.session_id.replace(".", "_")
+
         var client = requestJson.newClient('http://localhost:8080');
 
-        client.del("/Mapper-Servlet/Mappers/" + data.session_id, null, function (err, res, body) {
-            if (!err && res.statusCode == 200) {
+        var path = "/Mapper-Servlet/Mappers/" + data.session_id
+
+        console.log(path)
+
+
+        client.del(path, null, function (error, res, body) {
+            if (!error && res.statusCode == 200) {
+                data.session_id = data.session_id.replace("_", ".")
                 fs.readFile(fileName, "utf8", function (err, oriData) {
                     oriData = JSON.parse(oriData);
                     for (var i in oriData) {
@@ -271,6 +282,10 @@ function createServer(_server,_settings) {
                         response.end();
                     });
                 });
+            } else {
+                console.log('deploy reqeust error: ' + error);
+                response.json(request.body);
+                response.end();
             }
         });
     });
