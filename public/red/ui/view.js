@@ -33,6 +33,8 @@ RED.view = (function() {
     var activeWorkspace = 0;
     var workspaceScrollPositions = {};
 
+    var singleton = []; /** for controll the number of link if one port */
+
     var selected_link = null,
         mousedown_link = null,
         mousedown_node = null,
@@ -727,12 +729,24 @@ RED.view = (function() {
                 }
                 var rmlinks = RED.nodes.remove(node.id);
                 removedNodes.push(node);
+                var link = rmlinks[0];
+                var srcObjetc = JSON.stringify({"scr_id" : link.source.id, "src_port": link.sourcePort})
+                var dstObject = JSON.stringify({"dst_id" : link.target.id, "dst_port" : 0})
+                for (var i = 0; i < singleton.length; i++) {
+                    var existPort = JSON.stringify(singleton[i])
+                    if (existPort == srcObjetc || existPort == dstObject) {
+                        singleton.splice(i, 1)
+                        i--;
+                    }
+                }
                 removedLinks = removedLinks.concat(rmlinks);
             }
             moving_set = [];
             setDirty(true);
         }
         if (selected_link) {
+            console.log('selete link')
+            console.log(selected_link)
             RED.nodes.removeLink(selected_link);
             removedLinks.push(selected_link);
             setDirty(true);
@@ -789,7 +803,7 @@ RED.view = (function() {
         d3.event.preventDefault();
     }
 
-    var singleton = [];
+    // var singleton = [];
     function portMouseUp(d,portType,portIndex) {
         console.log("portMouseUp")
         document.body.style.cursor = "";
@@ -828,20 +842,29 @@ RED.view = (function() {
                 dst_port = mousedown_port_index;
             }
 
+
+
             var existingLink = false;
             RED.nodes.eachLink(function(d) {
                 existingLink = existingLink || (d.source === src && d.target === dst && d.sourcePort == src_port && d.targetPort == dst_port);
             });
 
+            console.log({"dst_id" : dst.id, "dst_port" : dst_port})
+
 
             /** promise each port only has one link */
             for (var i in singleton) {
-                if (JSON.stringify(singleton[i]) == JSON.stringify({"scr_id" : src.id, "src_port": src_port})) {
+                var srcObject = JSON.stringify({"scr_id" : src.id, "src_port": src_port})
+                var dstObject = JSON.stringify({"dst_id" : dst.id, "dst_port" : dst_port})
+                var existPort = JSON.stringify(singleton[i])
+                if (existPort == srcObject || existPort == dstObject) {
                     existingLink = true;
                 }
             }
             if (!existingLink) {
                 singleton.push({"scr_id" : src.id, "src_port": src_port});
+                singleton.push({"dst_id" : dst.id, "dst_port" : dst_port});
+                console.log(singleton);
             }
             /** promise each port only has one link */
 
