@@ -1495,16 +1495,19 @@ RED.view = (function() {
     $('#btn-export-clipboard').click(function() {showExportNodesDialog();});
     $('#btn-export-library').click(function() {showExportNodesLibraryDialog();});
 
+    var reDeployTimeout = null;
+
     function showExportNodesDialog() {
-        $("#ex7").modal({
-            fadeDuration: 500,
-            fadeDelay: 0.50,
-            escapeClose: true
-        });
 
         $("#ex7").on($.modal.CLOSE, function(event, modal) {
-            console.log("clise1");
-            // alert("success")
+            /** Auto mapping again */
+            setTimeout(function () {
+                $("#ex7").modal({
+                    fadeDuration: 500,
+                    fadeDelay: 0.50,
+                    escapeClose: true
+                });
+            }, 1000);
         });
 
         $("#ex7").on($.modal.OPEN, function(event, modal) {
@@ -1526,13 +1529,8 @@ RED.view = (function() {
             // $("#node-input-export").focus();
 
             /* construct JSON object for mapper */
-            var params = {
-                type: "req",
-                flow: nns
-            }
-
+            var params = { type: "req", flow: nns }
             console.log(params);
-
 
             /* send request to /deploy to fire Mapper for discovery */
             $.ajax({
@@ -1546,41 +1544,19 @@ RED.view = (function() {
                 success: function (data) {
                     console.log("get request data!");
                     console.log(data);
+                    var element = $("#ex7 p")
 
                     if (typeof data.success == 'undefined' || data.success == false) {
-                        var oriText = $("#ex7 p").text()
-                        console.log('deloy fail! Will try agian in 5 sec')
-                        setTimeout(showExportNodesDialog, 5000);
-                        $.modal.close()
-                        return;
+                        var oriText = element.text()
+                        var failText = 'service unavailable! Will try agian in 5 sec'
+                        console.log(failText)
+                        element.html(failText)
+                        setTimeout(function () { $.modal.close() }, 3000);
                     } else {
-
-                        /** store node id for color changing */
-                        // var nodeIdArray = []
-                        // for ( var i in data.flow) {
-                        //     nodeIdArray.push(data.flow[i].id)
-                        // }
-
-                        // socketClient = new WebSocket(data.webSocket);
-
-                        // socketClient.onmessage = function (event) {
-                        //     console.log(event)
-                        //     for (var i in nodeIdArray) {
-                        //         if (nodeIdArray[i] == event.data) {
-                        //             document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "blue";
-                        //         } else {
-                        //             /* reset other nodes that are not working currently */
-                        //             document.getElementById(nodeIdArray[i]).firstChild.style.stroke = "#999";
-                        //         }
-                        //     }
-                        // }
-
                         setTimeout(function() {
-                            var oriText = $("#ex7 p").text()
-                            $("#ex7 p").html("Success!!")
-                            setTimeout( function () {
-                                location.reload()
-                            }, 1000)
+                            var oriText = element.text()
+                            element.html("Success!!")
+                            setTimeout(function() { location.reload() }, 1000)
                         }, 3000);
                     }
                 },
@@ -1590,6 +1566,12 @@ RED.view = (function() {
                     console.log(errorThrown)
                 }
             });
+        });
+
+        $("#ex7").modal({
+            fadeDuration: 500,
+            fadeDelay: 0.50,
+            escapeClose: true
         });
     }
 

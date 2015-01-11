@@ -188,7 +188,7 @@ function createServer(_server,_settings) {
                                 /** subscribe the topic for each node */
                                 var topic = topicPrefix + body.flow[j].id
                                 mqttClient.subscribe(topic)
-                                console.log("mqtt sub topic: " + topic)
+                                console.log("mosquitto_pub -h 127.0.0.1 -t " + topic + " -m  'mosquitto'")
                             }
                         }
 
@@ -269,6 +269,7 @@ function createServer(_server,_settings) {
 
         client.del(path, null, function (error, res, body) {
             if (!error && res.statusCode == 200) {
+                console.log(body);
                 data.session_id = data.session_id.replace("_", ".")
                 fs.readFile(fileName, "utf8", function (err, oriData) {
                     oriData = JSON.parse(oriData);
@@ -289,12 +290,6 @@ function createServer(_server,_settings) {
             }
         });
     });
-
-    app.get("/socket", function(reqeust, response) {
-        var webSocket = comms.getWebSocket();
-        webSocket.send("!!!!@@@ Maydaycha");
-    });
-
 }
 
 
