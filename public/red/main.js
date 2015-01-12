@@ -268,9 +268,27 @@ var RED = (function() {
                 console.log(flow)
 
                 /** re-deploy */
-                RED.view.showExportNodesDialog(flow)
-                socketClient.close()
-
+                // socketClient.close()
+                if (typeof data != "undefined") {
+                    var params = {"session_id" : flow[0].z};
+                    console.log(params);
+                    $.ajax({
+                        url: "/undeploy",
+                        method: "delete",
+                        data: JSON.stringify(params),
+                        headers: {
+                            "Accept" : "application/json; charset=utf-8",
+                            "Content-Type" : "application/json; charset=utf-8"
+                        },
+                        success: function(data) {
+                            console.log('undeploy success');
+                            console.log(data);
+                            /** redeploy */
+                            RED.view.showExportNodesDialog(flow);
+                            // location.reload()
+                        }
+                    });
+                }
             } catch (err) {
                 /** if node id is not be persistence, store it */
                 if (nodeIds.indexOf(event.data) == -1) {
