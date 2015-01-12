@@ -272,7 +272,7 @@ function createServer(_server,_settings) {
 
                         ws.on('close', function close() {
                             console.log('websocket disconnected');
-                            // ws.close()
+                            ws.close()
                         });
                     });
 

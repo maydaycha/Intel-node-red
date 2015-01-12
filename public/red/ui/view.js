@@ -1526,6 +1526,8 @@ RED.view = (function() {
 
     function showExportNodesDialog(flow) {
 
+        $("#ex7").unbind();
+
         $("#ex7").on($.modal.CLOSE, function(event, modal) {
             /** Auto mapping again */
             setTimeout(function () {
@@ -1534,13 +1536,12 @@ RED.view = (function() {
                     fadeDelay: 0.50,
                     escapeClose: true
                 });
-            }, 1000);
+            }, 2000);
         });
 
         $("#ex7").on($.modal.OPEN, function(event, modal) {
             mouse_mode = RED.state.EXPORT;
             console.log("flow")
-            console.log(flow)
             var nns = (flow == null) ? RED.nodes.createExportableNodeSet(moving_set) : flow;
 
             $("#dialog-form").html($("script[data-template-name='export-clipboard-dialog']").html());
@@ -1586,7 +1587,7 @@ RED.view = (function() {
                         setTimeout(function() {
                             var oriText = element.text()
                             element.html("Success!!")
-                            setTimeout(function() { location.reload() }, 1000)
+                            // setTimeout(function() { location.reload() }, 1000)
                         }, 3000);
                     }
                 },
@@ -1603,6 +1604,9 @@ RED.view = (function() {
             fadeDelay: 0.50,
             escapeClose: true
         });
+
+        console.log('modal')
+        console.log($("#ex7"))
     }
 
     function getDesignFlow() {

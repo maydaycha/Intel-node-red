@@ -142,8 +142,6 @@ var RED = (function() {
         console.log('get desginData');
         console.log(data);
 
-        // return;
-
         if (typeof data != "undefined") {
             var params = {"session_id" : data[0].z};
             console.log(params);
@@ -156,8 +154,9 @@ var RED = (function() {
                     "Content-Type" : "application/json; charset=utf-8"
                 },
                 success: function(data) {
+                    console.log('undeploy success');
                     console.log(data);
-                    // location.reload()
+                    location.reload()
                 }
             });
         }
@@ -249,7 +248,6 @@ var RED = (function() {
         });
 
     }
-
     function setUpWebSocket () {
         var socketClient = new WebSocket("ws://localhost:5566");
         var nodeIds = [];
@@ -268,8 +266,11 @@ var RED = (function() {
                 var flow = JSON.parse(event.data);
                 console.log('[timeput] re deploy')
                 console.log(flow)
+
                 /** re-deploy */
                 RED.view.showExportNodesDialog(flow)
+                socketClient.close()
+
             } catch (err) {
                 /** if node id is not be persistence, store it */
                 if (nodeIds.indexOf(event.data) == -1) {
