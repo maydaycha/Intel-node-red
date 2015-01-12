@@ -1525,18 +1525,22 @@ RED.view = (function() {
     var reDeployTimeout = null;
 
     function showExportNodesDialog(flow) {
-
+        var flag = false;
         $("#ex7").unbind();
 
         $("#ex7").on($.modal.CLOSE, function(event, modal) {
             /** Auto mapping again */
-            setTimeout(function () {
-                $("#ex7").modal({
-                    fadeDuration: 500,
-                    fadeDelay: 0.50,
-                    escapeClose: true
-                });
-            }, 2000);
+            if (flag) {
+                setTimeout(function () {
+                    $("#ex7").modal({
+                        fadeDuration: 500,
+                        fadeDelay: 0.50,
+                        escapeClose: true
+                    });
+                }, 2000);
+                flag = false;
+            }
+
         });
 
         $("#ex7").on($.modal.OPEN, function(event, modal) {
@@ -1582,12 +1586,13 @@ RED.view = (function() {
                         var failText = 'service unavailable! Will try agian in 5 sec'
                         console.log(failText)
                         element.html(failText)
+                        flag = true
                         setTimeout(function () { $.modal.close() }, 3000);
                     } else {
                         setTimeout(function() {
                             var oriText = element.text()
                             element.html("Success!!")
-                            // setTimeout(function() { location.reload() }, 1000)
+                            setTimeout(function() { location.reload() }, 1000)
                         }, 3000);
                     }
                 },
@@ -1604,9 +1609,6 @@ RED.view = (function() {
             fadeDelay: 0.50,
             escapeClose: true
         });
-
-        console.log('modal')
-        console.log($("#ex7"))
     }
 
     function getDesignFlow() {
