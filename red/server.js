@@ -39,7 +39,7 @@ var settings = null;
 var storage = null;
 
 var wss = null;
-var mqttClient = null;
+// var mqttClient = null;
 
 function createServer(_server,_settings) {
     server = _server;
@@ -138,8 +138,9 @@ function createServer(_server,_settings) {
         }
     });
 
-    var topicAndTimeout = []
+
     var flowStorage = []
+    var gruopTopic = []
     app.post("/deploy", express.json(), function (request, response) {
         var fileName = localfilesystem.getSaveFlowFilePath();
         var data = request.body;
@@ -177,10 +178,11 @@ function createServer(_server,_settings) {
                         return response.send(body);
                     }
 
-                    if (mqttClient == null) {
-                        mqttClient = mqtt.createClient(1883, 'localhost');
-                    }
+                    // if (mqttClient == null) {
+                    var mqttClient = mqtt.createClient(1883, 'localhost');
+                    // }
                     var topicPrefix = "/formosa/" + uuid + "/"
+                    var gruopTopicArray = []
 
                     for (var i in oriData) {
                         for (var j in body.flow) {
@@ -189,43 +191,10 @@ function createServer(_server,_settings) {
 
                                 /** subscribe the topic for each node */
                                 var topic = topicPrefix + body.flow[j].id
-                                mqttClient.subscribe(topic)
-                                var timeoutObject = {
-                                     topic: topic,
-                                     setup: function () {
-                                        this.cancel();
-                                        this.timeoutID = setTimeout( function(msg, session_id, ws) {
-                                            console.log("in timeout : " + msg);
-                                            console.log("###########")
-                                            for (var i = 0; flowStorage.length; i++) {
-                                                if (flowStorage[i].session_id == session_id) {
-                                                    if (ws != null ) {
-                                                        if (typeof flowStorage[i].flow != 'undefined') {
-                                                            setTimeout( function (flow, ws) {
-                                                                ws.send(JSON.stringify(flow))
-                                                            }, 2000, flowStorage[i].flow, ws)
-                                                            flowStorage.splice(i, 1)
-                                                            console.log("remove flowStorage")
-                                                            console.log(flowStorage)
-                                                            break;
-                                                        }
-                                                    }
+                                // mqttClient.subscribe(topic)
+                                gruopTopicArray.push(topic)
 
-                                                }
-                                            }
-                                            console.log("###########")
-                                        }, 3000, this.topic, this.session_id, this.ws)
-                                     },
-                                     cancel: function() {
-                                        console.log("cancel: " + this.timeoutID)
-                                        clearTimeout(this.timeoutID);
-                                        delete this.timeoutID;
-                                     },
-                                     session_id: uuid,
-                                     ws: null
-                                }
-                                topicAndTimeout.push(timeoutObject)
-                                console.log("mosquitto_pub -h 127.0.0.1 -t " + topic + " -m  'mosquitto'")
+                                // console.log("mosquitto_pub -h 127.0.0.1 -t " + topic + " -m  'mosquitto'")
                             }
                         }
 
@@ -233,20 +202,29 @@ function createServer(_server,_settings) {
                             oriData[i].deploy = true
                         }
                     }
+
+                    /** subscribe the finish topic */
+                    // mqttClient.subscribe(topicPrefix + "finish")
+                    gruopTopic.push({session_id : uuid, topics : gruopTopicArray})
+
+                    console.log(gruopTopic)
+
+                    for (var i in gruopTopic) {
+                        for (var j in gruopTopic[i].topics) {
+                            /** subscribe the topic for each node */
+                            mqttClient.subscribe(gruopTopic[i].topics[j])
+                            console.log("mosquitto_pub -h 127.0.0.1 -t " + gruopTopic[i].topics[j] + " -m  'mosquitto'")
+                        }
+                        /** subscribe the finish topic */
+                        mqttClient.subscribe("/formosa/" + gruopTopic[i].session_id + "/finish")
+                        console.log("mosquitto_pub -h 127.0.0.1 -t " + "/formosa/" + gruopTopic[i].session_id + "/finish" + " -m  'mosquitto'")
+                    }
+
                     if (wss === null) wss = new WebSocketServer({ port: 5566 });
                     body.webSocket = "ws://localhost:" + 5566;
                     /** websocket handler */
                     wss.on('connection', function connection(ws) {
-                        var currentSessionId = "";
-                        for (var i in topicAndTimeout) {
-                            var obj = topicAndTimeout[i]
-                            var t = obj.topic.split("/")[2]
-                            obj.ws = ws;
-                            if (currentSessionId != t) {
-                                obj.setup()
-                                currentSessionId = t
-                            }
-                        }
+
                         ws.on('message', function incoming(message) {
                             console.log('received: %s', message);
                             // ws.close()
@@ -254,30 +232,40 @@ function createServer(_server,_settings) {
                             mqttClient.on('message', function (topic, message) {
                                 console.log("topic: " + topic + "; message: " + message)
                                 var splitArray = topic.split("/")
-                                var nodeId = splitArray[splitArray.length - 1]
+                                var session_id = splitArray[2]
 
-                                try {
-                                    console.log("[websocket] send: " + nodeId);
-                                    ws.send(nodeId);
-
-                                    /** restart timeout */
-                                    var currentSessionId2 = "";
-                                    for (var i in topicAndTimeout) {
-                                        var obj = topicAndTimeout[i]
-                                        if (topic == obj.topic) {
-                                            var t = obj.topic.split("/")[2]
-                                            if (currentSessionId2 != t) {
-                                                console.log('still alivce: ' + obj.topic)
-                                                obj.cancel();
-                                                obj.setup();
-                                                currentSessionId2 = t;
+                                if (splitArray[3] == 'finish') {
+                                    console.log("RuleEngine Finish")
+                                    for (var i = 0; i < flowStorage.length; i++) {
+                                        if (flowStorage[i].session_id == session_id) {
+                                            try {
+                                                ws.send(JSON.stringify(flowStorage[i].flow))
+                                                flowStorage.splice(i, 1)
+                                                break
+                                            } catch (e) {
+                                                console.log('[webSocket] send error: ' + e);
                                             }
-
                                         }
                                     }
-                                } catch (e) {
-                                    console.log('[webSocket] send error: ' + e);
+                                    for (var i = 0; i < gruopTopic.length; i++) {
+                                        if (gruopTopic[i].session_id == session_id) {
+                                            console.log("unsubscribe topics: " + gruopTopic[i].topics)
+                                            mqttClient.unsubscribe(gruopTopic[i].topics)
+                                            gruopTopic.splice(i, 1)
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    var nodeId = splitArray[splitArray.length - 1]
+                                    try {
+                                        console.log("[websocket] send: " + nodeId);
+                                        ws.send(nodeId);
+                                    } catch (e) {
+                                        console.log('[webSocket] send error: ' + e);
+                                    }
+
                                 }
+
                             })
                         });
                         // ws.send('something');

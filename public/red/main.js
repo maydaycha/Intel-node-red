@@ -263,7 +263,7 @@ var RED = (function() {
         }
         socketClient.onmessage = function (event) {
             // var data = JSON.parse(event.data);
-            // console.log(event.data)
+            console.log(event.data)
             try {
                 var flow = JSON.parse(event.data);
                 console.log('[timeput] re deploy')
