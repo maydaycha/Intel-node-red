@@ -730,15 +730,19 @@ RED.view = (function() {
                 var rmlinks = RED.nodes.remove(node.id);
                 removedNodes.push(node);
                 var link = rmlinks[0];
-                var srcObjetc = JSON.stringify({"scr_id" : link.source.id, "src_port": link.sourcePort})
-                var dstObject = JSON.stringify({"dst_id" : link.target.id, "dst_port" : 0})
-                for (var i = 0; i < singleton.length; i++) {
-                    var existPort = JSON.stringify(singleton[i])
-                    if (existPort == srcObjetc || existPort == dstObject) {
-                        singleton.splice(i, 1)
-                        i--;
+                if (typeof link != 'undefined') {
+                    var srcObjetc = JSON.stringify({"scr_id" : link.source.id, "src_port": link.sourcePort})
+                    var dstObject = JSON.stringify({"dst_id" : link.target.id, "dst_port" : 0})
+                    for (var i = 0; i < singleton.length; i++) {
+                        var existPort = JSON.stringify(singleton[i])
+                        if (existPort == srcObjetc || existPort == dstObject) {
+                            singleton.splice(i, 1)
+                            i--;
+                        }
                     }
+
                 }
+
                 removedLinks = removedLinks.concat(rmlinks);
             }
             moving_set = [];
@@ -1520,7 +1524,7 @@ RED.view = (function() {
 
     var reDeployTimeout = null;
 
-    function showExportNodesDialog() {
+    function showExportNodesDialog(flow) {
 
         $("#ex7").on($.modal.CLOSE, function(event, modal) {
             /** Auto mapping again */
@@ -1535,7 +1539,10 @@ RED.view = (function() {
 
         $("#ex7").on($.modal.OPEN, function(event, modal) {
             mouse_mode = RED.state.EXPORT;
-            var nns = RED.nodes.createExportableNodeSet(moving_set);
+            console.log("flow")
+            console.log(flow)
+            var nns = (flow == null) ? RED.nodes.createExportableNodeSet(moving_set) : flow;
+
             $("#dialog-form").html($("script[data-template-name='export-clipboard-dialog']").html());
             $("#node-input-export").val(JSON.stringify(nns));
             console.log(JSON.stringify(nns));

@@ -102,8 +102,6 @@ var RED = (function() {
                     }
                 });
 
-
-
                 // Once deployed, cannot undo back to a clean state
                 RED.history.markAllDirty();
                 RED.view.redraw();
@@ -129,8 +127,6 @@ var RED = (function() {
     // })
 
     $('#btn-deploy').click(function() {
-
-
         RED.view.selectAll();
         save();
         console.log(RED.view);
@@ -266,24 +262,35 @@ var RED = (function() {
             console.log('socket disconnected')
         }
         socketClient.onmessage = function (event) {
-
-            /** if node id is not be persistence, store it */
-            if (nodeIds.indexOf(event.data) == -1) {
-                nodeIds.push(event.data);
-            }
-            /** change the color of node which is acting currently */
-            for (var i in nodeIds) {
-                if (nodeIds[i] == event.data) {
-                    if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "blue";
-                } else {
-                    if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "#999";
+            // var data = JSON.parse(event.data);
+            // console.log(event.data)
+            try {
+                var flow = JSON.parse(event.data);
+                console.log('[timeput] re deploy')
+                console.log(flow)
+                /** re-deploy */
+                RED.view.showExportNodesDialog(flow)
+            } catch (err) {
+                /** if node id is not be persistence, store it */
+                if (nodeIds.indexOf(event.data) == -1) {
+                    nodeIds.push(event.data);
                 }
+                /** change the color of node which is acting currently */
+                for (var i in nodeIds) {
+                    if (nodeIds[i] == event.data) {
+                        if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "blue";
+                    } else {
+                        if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "#999";
+                    }
+                }
+
             }
-            console.log(event)
         }
         socketClient.onerror = function (event) {
             console.log('socket error')
         }
+
+
     }
 
     $('#btn-node-status').click(function() {toggleStatus();});

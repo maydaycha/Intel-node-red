@@ -138,7 +138,8 @@ function createServer(_server,_settings) {
         }
     });
 
-
+    var topicAndTimeout = []
+    var flowStorage = []
     app.post("/deploy", express.json(), function (request, response) {
         var fileName = localfilesystem.getSaveFlowFilePath();
         var data = request.body;
@@ -147,8 +148,9 @@ function createServer(_server,_settings) {
 
         // get uniqure session id from object z attribute ( equals to tab id)
         var uuid = data.flow[0].z
-
         console.log("uuid: " + uuid);
+
+        flowStorage.push({"session_id" : uuid, 'flow' : data.flow})
 
         fs.readFile(fileName, "utf8", function (err, oriData) {
             if (err) throw err
@@ -188,6 +190,41 @@ function createServer(_server,_settings) {
                                 /** subscribe the topic for each node */
                                 var topic = topicPrefix + body.flow[j].id
                                 mqttClient.subscribe(topic)
+                                var timeoutObject = {
+                                     topic: topic,
+                                     setup: function () {
+                                        this.cancel();
+                                        this.timeoutID = setTimeout( function(msg, session_id, ws) {
+                                            console.log("in timeout : " + msg);
+                                            console.log("###########")
+                                            for (var i = 0; flowStorage.length; i++) {
+                                                if (flowStorage[i].session_id == session_id) {
+                                                    if (ws != null ) {
+                                                        if (typeof flowStorage[i].flow != 'undefined') {
+                                                            setTimeout( function (flow, ws) {
+                                                                ws.send(JSON.stringify(flow))
+                                                            }, 2000, flowStorage[i].flow, ws)
+                                                            flowStorage.splice(i, 1)
+                                                            console.log("remove flowStorage")
+                                                            console.log(flowStorage)
+                                                            break;
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                            console.log("###########")
+                                        }, 3000, this.topic, this.session_id, this.ws)
+                                     },
+                                     cancel: function() {
+                                        console.log("cancel: " + this.timeoutID)
+                                        clearTimeout(this.timeoutID);
+                                        delete this.timeoutID;
+                                     },
+                                     session_id: uuid,
+                                     ws: null
+                                }
+                                topicAndTimeout.push(timeoutObject)
                                 console.log("mosquitto_pub -h 127.0.0.1 -t " + topic + " -m  'mosquitto'")
                             }
                         }
@@ -200,12 +237,21 @@ function createServer(_server,_settings) {
                     body.webSocket = "ws://localhost:" + 5566;
                     /** websocket handler */
                     wss.on('connection', function connection(ws) {
+                        var currentSessionId = "";
+                        for (var i in topicAndTimeout) {
+                            var obj = topicAndTimeout[i]
+                            var t = obj.topic.split("/")[2]
+                            obj.ws = ws;
+                            if (currentSessionId != t) {
+                                obj.setup()
+                                currentSessionId = t
+                            }
+                        }
                         ws.on('message', function incoming(message) {
                             console.log('received: %s', message);
                             // ws.close()
                             /** message arrive handler */
                             mqttClient.on('message', function (topic, message) {
-                                // console.log('got message!')
                                 console.log("topic: " + topic + "; message: " + message)
                                 var splitArray = topic.split("/")
                                 var nodeId = splitArray[splitArray.length - 1]
@@ -213,6 +259,22 @@ function createServer(_server,_settings) {
                                 try {
                                     console.log("[websocket] send: " + nodeId);
                                     ws.send(nodeId);
+
+                                    /** restart timeout */
+                                    var currentSessionId2 = "";
+                                    for (var i in topicAndTimeout) {
+                                        var obj = topicAndTimeout[i]
+                                        if (topic == obj.topic) {
+                                            var t = obj.topic.split("/")[2]
+                                            if (currentSessionId2 != t) {
+                                                console.log('still alivce: ' + obj.topic)
+                                                obj.cancel();
+                                                obj.setup();
+                                                currentSessionId2 = t;
+                                            }
+
+                                        }
+                                    }
                                 } catch (e) {
                                     console.log('[webSocket] send error: ' + e);
                                 }
@@ -220,10 +282,8 @@ function createServer(_server,_settings) {
                         });
                         // ws.send('something');
 
-
-
                         ws.on('close', function close() {
-                            console.log('disconnected');
+                            console.log('websocket disconnected');
                             // ws.close()
                         });
                     });
