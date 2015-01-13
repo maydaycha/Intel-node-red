@@ -269,7 +269,7 @@ var RED = (function() {
 
                 /** re-deploy */
                 // socketClient.close()
-                if (typeof data != "undefined") {
+                if (typeof flow != "undefined") {
                     var params = {"session_id" : flow[0].z};
                     console.log(params);
                     $.ajax({
@@ -295,13 +295,23 @@ var RED = (function() {
                     nodeIds.push(event.data);
                 }
                 /** change the color of node which is acting currently */
-                for (var i in nodeIds) {
-                    if (nodeIds[i] == event.data) {
-                        if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "blue";
-                    } else {
-                        if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "#999";
+                // for (var i in nodeIds) {
+                //     if (nodeIds[i] == event.data) {
+                //         if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "blue";
+                //     } else {
+                //         if (document.getElementById(nodeIds[i]) != null) document.getElementById(nodeIds[i]).firstChild.style.stroke = "#999";
+                //     }
+                // }
+                if (document.getElementById(event.data) != null) {
+                    if (document.getElementById(event.data).firstChild.style.stroke != "#FF4000") {
+                        console.log('same color')
+                        document.getElementById(event.data).firstChild.style.stroke = "#FF4000"
                     }
                 }
+
+                setTimeout(function (ele) {
+                    if (document.getElementById(ele) != null) document.getElementById(ele).firstChild.style.stroke = "#999"
+                }, 1000, event.data)
 
             }
         }
