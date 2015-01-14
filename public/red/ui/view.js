@@ -1587,7 +1587,7 @@ RED.view = (function() {
                         console.log(failText)
                         element.html(failText)
                         flag = true
-                        setTimeout(function () { $.modal.close() }, 3000);
+                        setTimeout(function () { $.modal.close() }, 5000);
                     } else {
                         setTimeout(function() {
                             var oriText = element.text()

@@ -284,7 +284,11 @@ var RED = (function() {
                             console.log('undeploy success');
                             console.log(data);
                             /** redeploy */
-                            RED.view.showExportNodesDialog(flow);
+                            setTimeout( function (flow) {
+                                console.log("********** redeploy ************")
+                                RED.view.showExportNodesDialog(flow);
+                            }, 7000, flow)
+                            // RED.view.showExportNodesDialog(flow);
                             // location.reload()
                         }
                     });
@@ -304,13 +308,19 @@ var RED = (function() {
                 // }
                 if (document.getElementById(event.data) != null) {
                     if (document.getElementById(event.data).firstChild.style.stroke != "#FF4000") {
-                        console.log('same color')
-                        document.getElementById(event.data).firstChild.style.stroke = "#FF4000"
+                        // console.log('same color')
+                        var d = document.getElementById(event.data).firstChild
+                        d.style.stroke = "#FF4000"
+                        d.style.strokeWidth = 4;
                     }
                 }
 
                 setTimeout(function (ele) {
-                    if (document.getElementById(ele) != null) document.getElementById(ele).firstChild.style.stroke = "#999"
+                    if (document.getElementById(ele) != null) {
+                        var d = document.getElementById(ele).firstChild
+                        d.style.stroke = "#999"
+                        d.style.strokeWidth = 2
+                    }
                 }, 1000, event.data)
 
             }

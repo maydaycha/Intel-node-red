@@ -16,6 +16,7 @@
 
 body {
   font: 13px "Helvetica" !important;
+  /*font: 60px "Helvetica" !important;*/
   padding-top: 100px;
   background: url("pw_maze_white.png");
 }
@@ -366,6 +367,7 @@ a.brand img {
    stroke-width: 0;
    fill: #333;
    font-size: 14px;
+   /*font-size: 20px;*/
    pointer-events: none;
    -webkit-touch-callout: none;
    -webkit-user-select: none;
@@ -382,6 +384,11 @@ a.brand img {
   stroke: #999;
   cursor: move;
   stroke-width: 2;
+}
+.node_strong {
+  stroke: #999;
+  cursor: move;
+  stroke-width: 4;
 }
 .node_unknown {
     stroke-dasharray:10,4;
@@ -442,6 +449,7 @@ a.brand img {
 }
 .node_selected {
    stroke: #ff7f0e;
+   stroke-width: 4;
 }
 .node_highlighted {
    stroke: #dd1616;

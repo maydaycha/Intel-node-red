@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
- 
+
 RED.comms = (function() {
-    
+
     var errornotification = null;
     var subscriptions = {};
     var ws;
@@ -55,12 +55,12 @@ RED.comms = (function() {
         };
         ws.onclose = function() {
             if (errornotification == null) {
-                errornotification = RED.notify("<b>Error</b>: Lost connection to server","error",true);
+                // errornotification = RED.notify("<b>Error</b>: Lost connection to server","error",true);
             }
             setTimeout(connectWS,1000);
         }
     }
-    
+
     function subscribe(topic,callback) {
         if (subscriptions[topic] == null) {
             subscriptions[topic] = [];
@@ -70,8 +70,8 @@ RED.comms = (function() {
             ws.send(JSON.stringify({subscribe:topic}));
         }
     }
-    
-    
+
+
     return {
         connect: connectWS,
         subscribe: subscribe
