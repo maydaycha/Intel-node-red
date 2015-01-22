@@ -34,6 +34,7 @@ RED.view = (function() {
     var workspaceScrollPositions = {};
 
     var singleton = []; /** for controll the number of link if one port */
+    var limitLinkDeviceType = ["And", "Or", "Equal", "Less Equal Than", "Less Than"];
 
     var selected_link = null,
         mousedown_link = null,
@@ -731,16 +732,25 @@ RED.view = (function() {
                 removedNodes.push(node);
                 var link = rmlinks[0];
                 if (typeof link != 'undefined') {
-                    var srcObjetc = JSON.stringify({"scr_id" : link.source.id, "src_port": link.sourcePort})
-                    var dstObject = JSON.stringify({"dst_id" : link.target.id, "dst_port" : 0})
-                    for (var i = 0; i < singleton.length; i++) {
-                        var existPort = JSON.stringify(singleton[i])
-                        if (existPort == srcObjetc || existPort == dstObject) {
-                            singleton.splice(i, 1)
-                            i--;
+                    console.log(link)
+                    var needCheck = false;
+
+                    for (var i in limitLinkDeviceType) {
+                        if (link.source.deviceType === limitLinkDeviceType[i] || link.target.deviceType === limitLinkDeviceType[i]) {
+                            needCheck = true
                         }
                     }
-
+                    if (needCheck) {
+                        var srcObjetc = JSON.stringify({"scr_id" : link.source.id, "src_port": link.sourcePort})
+                        var dstObject = JSON.stringify({"dst_id" : link.target.id, "dst_port" : 0})
+                        for (var i = 0; i < singleton.length; i++) {
+                            var existPort = JSON.stringify(singleton[i])
+                            if (existPort == srcObjetc || existPort == dstObject) {
+                                singleton.splice(i, 1)
+                                i--;
+                            }
+                        }
+                    }
                 }
 
                 removedLinks = removedLinks.concat(rmlinks);
@@ -814,6 +824,7 @@ RED.view = (function() {
         if (mouse_mode == RED.state.JOINING && mousedown_node) {
             if (typeof TouchEvent != "undefined" && d3.event instanceof TouchEvent) {
                 RED.nodes.eachNode(function(n) {
+                    // console.log(n);
                         if (n.z == activeWorkspace) {
                             var hw = n.w/2;
                             var hh = n.h/2;
@@ -828,6 +839,7 @@ RED.view = (function() {
             } else {
                 mouseup_node = d;
             }
+            // console.log(mouseup_node)
             if (portType == mousedown_port_type || mouseup_node === mousedown_node) {
                 drag_line.attr("class", "drag_line_hidden");
                 resetMouseVars();
@@ -855,22 +867,32 @@ RED.view = (function() {
 
             console.log({"dst_id" : dst.id, "dst_port" : dst_port})
 
-
-            /** promise each port only has one link */
-            for (var i in singleton) {
-                var srcObject = JSON.stringify({"scr_id" : src.id, "src_port": src_port})
-                var dstObject = JSON.stringify({"dst_id" : dst.id, "dst_port" : dst_port})
-                var existPort = JSON.stringify(singleton[i])
-                if (existPort == srcObject || existPort == dstObject) {
-                    existingLink = true;
+            var needCheck = false
+            for (var i in limitLinkDeviceType) {
+                if (mouseup_node.deviceType === limitLinkDeviceType[i]) {
+                    needCheck = true
+                    break
                 }
             }
-            if (!existingLink) {
-                singleton.push({"scr_id" : src.id, "src_port": src_port});
-                singleton.push({"dst_id" : dst.id, "dst_port" : dst_port});
-                console.log(singleton);
+
+            if (needCheck) {
+                /** promise each port only has one link */
+                for (var i in singleton) {
+                    var srcObject = JSON.stringify({"scr_id" : src.id, "src_port": src_port})
+                    var dstObject = JSON.stringify({"dst_id" : dst.id, "dst_port" : dst_port})
+                    var existPort = JSON.stringify(singleton[i])
+                    if (existPort == srcObject || existPort == dstObject) {
+                        existingLink = true;
+                    }
+                }
+                if (!existingLink) {
+                    singleton.push({"scr_id" : src.id, "src_port": src_port});
+                    singleton.push({"dst_id" : dst.id, "dst_port" : dst_port});
+                    console.log(singleton);
+                }
+                /** promise each port only has one link */
             }
-            /** promise each port only has one link */
+
 
             if (!existingLink) {
                 var link = {source: src, sourcePort:src_port, target: dst, targetPort: dst_port};

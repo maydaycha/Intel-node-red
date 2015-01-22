@@ -167,7 +167,7 @@ function createServer(_server,_settings) {
             data.session_id = uuid;
 
             /** Call Mapper servelt */
-            var client = requestJson.newClient('http://localhost:8080');
+            var client = requestJson.newClient('http://localhost:8081');
             client.post("/Mapper-Servlet/Mappers", data, function (err, res, body) {
                 if (!err && res.statusCode == 200) {
 
@@ -298,7 +298,7 @@ function createServer(_server,_settings) {
         /** trick for pass params who has "."" */
         data.session_id = data.session_id.replace(".", "_")
 
-        var client = requestJson.newClient('http://localhost:8080');
+        var client = requestJson.newClient('http://localhost:8081');
 
         var path = "/Mapper-Servlet/Mappers/" + data.session_id
 

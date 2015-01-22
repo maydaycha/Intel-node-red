@@ -252,6 +252,8 @@ var RED = (function() {
         var socketClient = new WebSocket("ws://localhost:5566");
         var nodeIds = [];
 
+        var timeoutReference = {}
+
         socketClient.onopen = function (event) {
             console.log("connect sokcet")
             socketClient.send('start flag')
@@ -308,20 +310,22 @@ var RED = (function() {
                 // }
                 if (document.getElementById(event.data) != null) {
                     if (document.getElementById(event.data).firstChild.style.stroke != "#FF4000") {
-                        // console.log('same color')
+                        if (typeof timeoutReference[event.data] != 'undefined') {
+                            clearTimeout(timeoutReference[event.data])
+                        }
                         var d = document.getElementById(event.data).firstChild
                         d.style.stroke = "#FF4000"
                         d.style.strokeWidth = 4;
                     }
                 }
 
-                setTimeout(function (ele) {
+                timeoutReference[event.data] = setTimeout(function (ele) {
                     if (document.getElementById(ele) != null) {
                         var d = document.getElementById(ele).firstChild
                         d.style.stroke = "#999"
                         d.style.strokeWidth = 2
                     }
-                }, 1000, event.data)
+                }, 500, event.data)
 
             }
         }
