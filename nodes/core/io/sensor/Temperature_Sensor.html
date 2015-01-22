@@ -4,8 +4,9 @@
         color: '#a6bbcf',
         defaults: {
             name: {value: ""},
-            deviceType: {value: "TemperatureMeasurement_S"},
+            deviceType: {value: "TEMPERATUREMEASURE_S"},
             deviceName: {value: ""},
+            category: {value: "input"},
             check: {value: true}
         },
         inputs:1,
@@ -27,10 +28,6 @@
         <label for="node-input-deviceName"><i class="icon-tag"></i>Real Device Name</label>
         <input type="text" id="node-input-deviceName" disabled>
     </div>
-
-
-    <!-- /** for mapper to identified if need to fire discovey */-->
-    <input type="hidden" id="node-input-check" placeholder="true" hidden>
 
 
 

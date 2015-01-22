@@ -34,7 +34,11 @@ RED.view = (function() {
     var workspaceScrollPositions = {};
 
     var singleton = []; /** for controll the number of link if one port */
-    var limitLinkDeviceType = ["And", "Or", "Equal", "Less Equal Than", "Less Than"];
+    var limitLinkDeviceType = ["And", "Or", "Equal", "LessEqualThan", "LessThan", "ONOFF_S", "IASWD_S", "ILLUMINANCEMEASURE_S", "IASZONE_S", "TEMPERATUREMEASURE_S", "Number"]
+
+    var allInputDeviceTypes = ["ILLUMINANCEMEASURE_S", "IASZONE_S", "TEMPERATUREMEASURE_S", "Number"]
+    var allOutputDeviceTypes = ["ONOFF_S", "IASWD_S"]
+    var allFunctionTypes = ["And", "Equal", "LessEqualThan", "LessThan", "Normal", "Or"]
 
     var selected_link = null,
         mousedown_link = null,
@@ -406,6 +410,7 @@ RED.view = (function() {
 
         var mousePos;
         if (mouse_mode == RED.state.JOINING) {
+            console.log("409")
             // update drag line
             drag_line.attr("class", "drag_line");
             mousePos = mouse_position;
@@ -431,12 +436,11 @@ RED.view = (function() {
                 }
             }
 
-            drag_line.attr("d",
-                "M "+(mousedown_node.x+sc*mousedown_node.w/2)+" "+(mousedown_node.y+portY)+
-                " C "+(mousedown_node.x+sc*(mousedown_node.w/2+node_width*scale))+" "+(mousedown_node.y+portY+scaleY*node_height)+" "+
-                (mousePos[0]-sc*(scale)*node_width)+" "+(mousePos[1]-scaleY*node_height)+" "+
-                mousePos[0]+" "+mousePos[1]
-                );
+            // drag_line.attr("d", "M "+(mousedown_node.x+sc*mousedown_node.w/2)+" "+(mousedown_node.y+portY)+ " C "+(mousedown_node.x+sc*(mousedown_node.w/2+node_width*scale))+" "+(mousedown_node.y+portY+scaleY*node_height)+" "+ (mousePos[0]-sc*(scale)*node_width)+" "+(mousePos[1]-scaleY*node_height)+" "+ mousePos[0]+" "+mousePos[1]);
+
+
+            drag_line.attr("d", "M "+(mousedown_node.x+sc*mousedown_node.w/2)+" "+(mousedown_node.y+portY)+ " C "+( mousePos[0]-sc*(scale)*node_width)+" "+(mousedown_node.y+portY+scaleY*node_height)+" "+ (mousedown_node.x+sc*(mousedown_node.w/2+node_width*scale))+" "+(mousePos[1]-scaleY*node_height)+" "+ mousePos[0]+" "+mousePos[1]);
+
             d3.event.preventDefault();
         } else if (mouse_mode == RED.state.MOVING) {
             mousePos = mouse_position;
@@ -806,6 +810,10 @@ RED.view = (function() {
     }
 
     function portMouseDown(d,portType,portIndex) {
+        console.log("portMouseDown")
+        console.log(d)
+        console.log(portType)
+        console.log(portIndex)
         // disable zoom
         //vis.call(d3.behavior.zoom().on("zoom"), null);
         mousedown_node = d;
@@ -813,7 +821,8 @@ RED.view = (function() {
         mouse_mode = RED.state.JOINING;
         mousedown_port_type = portType;
         mousedown_port_index = portIndex || 0;
-        document.body.style.cursor = "crosshair";
+
+        // document.body.style.cursor = "crosshair";
         d3.event.preventDefault();
     }
 
@@ -874,6 +883,9 @@ RED.view = (function() {
                     break
                 }
             }
+
+            console.log("need " + needCheck);
+
 
             if (needCheck) {
                 /** promise each port only has one link */
@@ -1210,9 +1222,27 @@ RED.view = (function() {
                         var y = (d.h/2)-((numInputs-1)/2)*13;
                         y = (y+13*n)-5;
                         text.attr("x",38);
-                        node.append("rect").attr("class","port port_input").attr("rx",3).attr("ry",3).attr("y",y).attr("x",-5).attr("width",10).attr("height",10)
-                            .on("mousedown", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
-                            .on("touchstart", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
+                        var x = d.w - 5;
+                        console.log("node");
+                        console.log(d)
+                        var addedClass = "";
+                        for (var i in allInputDeviceTypes) {
+                            if (d.deviceType === allInputDeviceTypes[i]) {
+                                addedClass = "sensor_out_function_in"
+                                break
+                            }
+                        }
+
+                        for (var i in allFunctionTypes) {
+                            if (d.deviceType === allFunctionTypes[i]) {
+                                addedClass = "functon_out_actuator_in"
+                                break
+                            }
+                        }
+
+                        node.append("rect").attr("class","port port_input " + addedClass ).attr("rx",3).attr("ry",3).attr("y",y).attr("x",x).attr("width",10).attr("height",10)
+                            .on("mousedown", (function(nn){return function(d){ console.log("mousedown"); portMouseDown(d,1, nn);}})(n))
+                            .on("touchstart", (function(nn){return function(d){ portMouseDown(d,1,nn);}})(n))
                             .on("mouseup", (function(nn){return function(d){portMouseUp(d,1,nn);}})(n))
                             .on("touchend", (function(nn){return function(d){portMouseUp(d,1,nn);}})(n))
                             .on("mouseover",function(d) { var port = d3.select(this); port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 1 ));})
@@ -1256,7 +1286,27 @@ RED.view = (function() {
                         var y = (d.h/2)-((numOutputs-1)/2)*13;
                         d.ports = d.ports || d3.range(numOutputs);
                         d._ports = thisNode.selectAll(".port_output").data(d.ports);
-                        d._ports.enter().append("rect").attr("class","port port_output").attr("rx",3).attr("ry",3).attr("width",10).attr("height",10)
+
+                        console.log("maydayhca");
+                        console.log(d);
+
+                        var addedClass = "";
+                        for (var i in allOutputDeviceTypes) {
+                            if (d.deviceType === allOutputDeviceTypes[i]) {
+                                addedClass = "functon_out_actuator_in"
+                                break
+                            }
+                        }
+
+                        for (var i in allFunctionTypes) {
+                            if (d.deviceType === allFunctionTypes[i]) {
+                                addedClass = "sensor_out_function_in"
+                                break
+                            }
+                        }
+
+
+                        d._ports.enter().append("rect").attr("class","port port_output " + addedClass).attr("rx",3).attr("ry",3).attr("width",10).attr("height",10)
                             .on("mousedown",(function(){var node = d;  return function(d,i){portMouseDown(node,0,i);}})() )
                             .on("touchstart",(function(){var node = d; return function(d,i){portMouseDown(node,0,i);}})() )
                             .on("mouseup",(function(){var node = d; return function(d,i){portMouseUp(node,0,i);}})() )
@@ -1267,7 +1317,8 @@ RED.view = (function() {
                         if (d._ports) {
                             numOutputs = d.outputs || 1;
                             y = (d.h/2)-((numOutputs-1)/2)*13;
-                            var x = d.w - 5;
+                            // var x = d.w - 5;
+                            var x = -5;
                             d._ports.each(function(d,i) {
                                     var port = d3.select(this);
                                     port.attr("y",(y+13*i)-5).attr("x",x);
@@ -1393,6 +1444,7 @@ RED.view = (function() {
                     d3.event.stopPropagation();
                 })
                 .on("touchstart",function(d) {
+                    console.log('maydayhc')
                     mousedown_link = d;
                     clearSelection();
                     selected_link = mousedown_link;
@@ -1402,6 +1454,9 @@ RED.view = (function() {
                 });
             l.append("svg:path").attr("class","link_outline link_path");
             l.append("svg:path").attr("class","link_line link_path");
+
+            // l.append("svg:path").attr("class","link_line link_path");
+            // l.append("svg:path").attr("class","link_outline link_path");
         });
 
         link.exit().remove();
@@ -1436,10 +1491,15 @@ RED.view = (function() {
                 d.x2 = d.target.x-d.target.w/2;
                 d.y2 = d.target.y+ytarget;
 
-                return "M "+(d.x1)+" "+(d.y1)+
-                    " C "+(d.x1+scale*node_width)+" "+(d.y1+scaleY*node_height)+" "+
-                    (d.x2-scale*node_width)+" "+(d.y2-scaleY*node_height)+" "+
-                    (d.x2)+" "+d.y2;
+
+                // return "M "+(d.x1)+" "+(d.y1)+ " C "+(d.x1+scale*node_width)+" "+(d.y1+scaleY*node_height)+" "+ (d.x2-scale*node_width)+" "+(d.y2-scaleY*node_height)+" "+ (d.x2)+" "+d.y2;
+
+                // return "M "+(d.x2)+" "+(d.y2)+ " C "+(d.x2+scale*node_width)+" "+(d.y2+scaleY*node_height)+" "+ (d.x1-scale*node_width)+" "+(d.y1-scaleY*node_height)+" "+ (d.x1)+" "+d.y1;
+
+                return "M " + (d.x1) + " " + (d.y1) + " C " + (d.x2-scale*node_width) + " " + (d.y1-scaleY*node_height)+ " " + (d.x1+scale*node_width) + " " + (d.y2-scaleY*node_height) + " " + (d.x2) + " " + d.y2;
+
+
+
         })
 
         link.classed("link_selected", function(d) { return d === selected_link || d.selected; });

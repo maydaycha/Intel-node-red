@@ -890,4 +890,15 @@ i.spinner {
 }
 
 
+/*.port_input {*/
+  /*fill: rgb(166, 187, 207);*/
+/*}*/
+
+.sensor_out_function_in {
+  fill: rgb(166, 187, 207);
+}
+
+.functon_out_actuator_in {
+  fill: rgb(135, 169, 128)
+}
 

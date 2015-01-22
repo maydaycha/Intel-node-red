@@ -6,8 +6,9 @@
         align: "right",
         defaults: {
             name: { value:"" },
-            deviceType: {value: "Meter_S"},
+            deviceType: {value: "ONOFF_S"},
             deviceName: {value: ""},
+            category: {value: "output"},
             check: {value: true}
         },
         inputs:0,
@@ -21,18 +22,15 @@
 
 <script type="text/x-red" data-template-name="Power Switch">
     <div class="form-row">
-        <div class="form-row">
-            <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-            <input type="text" id="node-input-name" placeholder="Name">
-        </div>
-
-        <div class="form-row">
-            <label for="node-input-deviceName"><i class="icon-tag"></i>Real Device Name</label>
-            <input type="text" id="node-input-deviceName" disabled>
-        </div>
-
-        <input type="hidden" id="node-input-check" value="true">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
+
+    <div class="form-row">
+        <label for="node-input-deviceName"><i class="icon-tag"></i>Real Device Name</label>
+        <input type="text" id="node-input-deviceName" disabled>
+    </div>
+
 </script>
 
 <script type="text/x-red" data-help-name="Power Switch">

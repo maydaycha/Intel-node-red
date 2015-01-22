@@ -145,6 +145,8 @@ function createServer(_server,_settings) {
         var fileName = localfilesystem.getSaveFlowFilePath();
         var data = request.body;
 
+        console.log(JSON.stringify(data))
+
         // var uuid = genUuid(null);
 
         // get uniqure session id from object z attribute ( equals to tab id)
