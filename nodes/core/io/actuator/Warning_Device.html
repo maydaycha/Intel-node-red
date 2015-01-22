@@ -1,22 +1,25 @@
 <script type="text/javascript">
-    RED.nodes.registerType('Meter_S',{
+    RED.nodes.registerType('Warning Device',{
         category: 'output',
-        color: '#a6bbcf',
+        color:"#87a980",
+        icon: "debug.png",
+        align: "right",
         defaults: {
             name: { value:"" },
-            deviceName: {value: ""},
+            deviceType: { value : "IASWD_S"},
+            deviceName: { value: "" },
             check: {value: false}
         },
         inputs:0,
         outputs:1,
-        icon: "light.png",
+        // icon: "light.png",
         label: function() {
-            return this.name || "Meter_S";
+            return this.name || "Warning Device";
         }
     });
 </script>
 
-<script type="text/x-red" data-template-name="Meter_S">
+<script type="text/x-red" data-template-name="Warning Device">
     <div class="form-row">
         <div class="form-row">
             <label for="node-input-name"><i class="icon-tag"></i> Name</label>
@@ -32,7 +35,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="Meter_S">
+<script type="text/x-red" data-help-name="Warning Device">
     <p>Power-Switch</p>
 </script>
 

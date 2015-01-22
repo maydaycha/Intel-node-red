@@ -104,7 +104,7 @@ a.brand img {
 
 #palette {
    background: #f3f3f3;
-   width: 140px;
+   width: 200px;
    text-align: center;
    -webkit-user-select: none;
    -khtml-user-select: none;
@@ -118,9 +118,10 @@ a.brand img {
     top: 0;
     left:0;
     right: 0;
-    bottom: 35px;
-    padding: 5px;
+    bottom: 10px;
+    padding: 5px 5px 5px 5px;
     overflow-y: auto;
+    margin-top: 35px;
     box-sizing:border-box;
     -moz-box-sizing: border-box;
 }
@@ -130,7 +131,7 @@ a.brand img {
 #palette-search {
     position: absolute;
     display: none;
-    bottom: 0;
+    /*bottom: 0;*/
     left:0;
     right:0;
     overflow: hidden;
@@ -186,6 +187,8 @@ a.brand img {
     background: #fff;
     border-top: 1px solid #aaa;
     padding-bottom: 3px;
+    padding-right: 10px;
+    padding-left: 10px;
 }
 
 .palette-header {
@@ -228,9 +231,9 @@ a.brand img {
    border: 2px solid #999;
    background-position: 5% 50%;
    background-repeat: no-repeat;
-   width: 90px;
+   /*width: 90px;*/
    background-size: contain;
-   position: relative;
+   /*position: relative;*/
 }
 .palette_node:hover {
   border-color: #ff7f0e;
@@ -281,14 +284,14 @@ a.brand img {
 #workspace {
     position: absolute;
     margin: 0;
-    top:5px; left:160px; bottom: 10px; right: 330px;
+    top:5px; left:220px; bottom: 10px; right: 280px;
 }
 #chart-zoom-controls {
     position: absolute;
     bottom:30px; right: 350px;
 }
 #sidebar {
-    width: 305px;
+    width: 240px;
     position: absolute;
     right: 10px; top: 5px; bottom:10px;
 }
@@ -296,7 +299,7 @@ a.brand img {
     width: 15px;
     background: url(grip.png) no-repeat 50% 50%;
     position: absolute;
-    right: 316px; top: 5px; bottom:10px;
+    right: 246px; top: 5px; bottom:10px;
     cursor: col-resize;
 }
 
@@ -308,10 +311,10 @@ a.brand img {
 /* ---------- end layout ---------- */
 
 .lasso {
-    stroke-width: 2px;
+    /*stroke-width: 2px;
     stroke: #ff7f0e;
     fill: rgba(20,125,255,0.1);
-    stroke-dasharray: 10 5;
+    stroke-dasharray: 10 5;*/
 }
 
 .group-box {

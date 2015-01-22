@@ -343,16 +343,16 @@ RED.view = (function() {
 
             if (!touchStartTime) {
                 var point = d3.mouse(this);
-                lasso = vis.append('rect')
-                    .attr("ox",point[0])
-                    .attr("oy",point[1])
-                    .attr("rx",2)
-                    .attr("ry",2)
-                    .attr("x",point[0])
-                    .attr("y",point[1])
-                    .attr("width",0)
-                    .attr("height",0)
-                    .attr("class","lasso");
+                // lasso = vis.append('rect')
+                //     .attr("ox",point[0])
+                //     .attr("oy",point[1])
+                //     .attr("rx",2)
+                //     .attr("ry",2)
+                //     .attr("x",point[0])
+                //     .attr("y",point[1])
+                //     .attr("width",0)
+                //     .attr("height",0)
+                //     .attr("class","lasso");
                 d3.event.preventDefault();
             }
         }
@@ -1269,9 +1269,9 @@ RED.view = (function() {
                         });
                         thisNode.selectAll(".node_tools").attr("x",function(d){return d.w-35;}).attr("y",function(d){return d.h-20;});
 
-                        thisNode.selectAll(".node_changed")
-                            .attr("x",function(d){return d.w-10})
-                            .classed("hidden",function(d) { return !d.changed; });
+                        // thisNode.selectAll(".node_changed")
+                        //     .attr("x",function(d){return d.w-10})
+                        //     .classed("hidden",function(d) { return !d.changed; });
 
                         thisNode.selectAll(".node_error")
                             .attr("x",function(d){return d.w-10-(d.changed?13:0)})
@@ -1441,9 +1441,9 @@ RED.view = (function() {
     function setDirty(d) {
         dirty = d;
         if (dirty) {
-            $("#btn-deploy").removeClass("disabled").addClass("btn-danger");
+            // $("#btn-deploy").removeClass("disabled").addClass("btn-danger");
         } else {
-            $("#btn-deploy").addClass("disabled").removeClass("btn-danger");
+            // $("#btn-deploy").addClass("disabled").removeClass("btn-danger");
         }
     }
 
@@ -1564,7 +1564,7 @@ RED.view = (function() {
             // $("#node-input-export").focus();
 
             /* construct JSON object for mapper */
-            var params = { type: "req", flow: nns }
+            var params = { type: "req", session_id: nns[0].z, flow: nns }
             console.log(params);
 
             /* send request to /deploy to fire Mapper for discovery */

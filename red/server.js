@@ -148,8 +148,8 @@ function createServer(_server,_settings) {
         // var uuid = genUuid(null);
 
         // get uniqure session id from object z attribute ( equals to tab id)
-        var uuid = data.flow[0].z
-        console.log("uuid: " + uuid);
+        var uuid = data.session_id
+        console.log("uuid: " + uuid)
 
         flowStorage.push({"session_id" : uuid, 'flow' : data.flow})
 
@@ -276,19 +276,9 @@ function createServer(_server,_settings) {
                         });
                     });
 
-
-
                     /** write to flow config file */
                     fs.writeFile(fileName, JSON.stringify(oriData), function (err) {
                         if (err) throw err;
-                        // var websocket = comms.getWebsocket();
-
-                        // webSocket.send("!!!!@@@ Maydaycha");
-
-                        console.log("=============");
-                        console.log(oriData);
-                        console.log("=============");
-
                         return response.json(body);
                     });
 

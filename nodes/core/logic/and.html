@@ -1,27 +1,31 @@
 <script type="text/javascript">
     RED.nodes.registerType('And',{
         category: 'function',
-        color: '#a6bbcf',
+        color:"#fdd0a2",
         defaults: {
-            name: { value:"And" },
+            name: { value:"" },
+            deviceType: {value: "And"},
             check: {value: false}
         },
         inputs:1,
         outputs:2,
-        icon: "light.png",
+        // icon: "light.png",
         label: function() {
-            return this.name || "And";
+            return this.name || "And (&&)";
         }
     });
 </script>
 
 <script type="text/x-red" data-template-name="And">
-    <div class="form-row">
-        <div class="form-row">
-            <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-            <input type="text" id="node-input-name" placeholder="Name" value="==">
-        </div>
 
+    <!--
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" value="==">
+    </div>
+    -->
+
+    <div class="form-row">
         <input type="hidden" id="node-input-check" value="false">
     </div>
 </script>

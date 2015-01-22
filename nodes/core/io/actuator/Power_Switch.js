@@ -13,5 +13,5 @@ module.exports = function(RED) {
             console.log('close!');
         });
     }
-    RED.nodes.registerType("LessEqualThan", ActuatorOut);
+    RED.nodes.registerType("Power Switch", ActuatorOut);
 }

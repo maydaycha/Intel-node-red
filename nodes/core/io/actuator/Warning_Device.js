@@ -13,5 +13,5 @@ module.exports = function(RED) {
             console.log('close!');
         });
     }
-    RED.nodes.registerType("Meter_S", ActuatorOut);
+    RED.nodes.registerType("Warning Device", ActuatorOut);
 }

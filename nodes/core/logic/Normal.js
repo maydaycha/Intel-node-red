@@ -1,5 +1,5 @@
 module.exports = function(RED) {
-    function SensorIn(config) {
+    function ActuatorOut(config) {
         RED.nodes.createNode(this, config);
 
         var node = this;
@@ -9,8 +9,9 @@ module.exports = function(RED) {
             node.send(msg);
         });
 
-        // this.on('close', function () {
-        // });
+        this.on('close', function () {
+            console.log('close!');
+        });
     }
-    RED.nodes.registerType("OccupancySensing_S", SensorIn);
+    RED.nodes.registerType("Less_Than", ActuatorOut);
 }

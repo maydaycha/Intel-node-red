@@ -86,7 +86,7 @@ var RED = (function() {
                 data: JSON.stringify(nns),
                 contentType: "application/json; charset=utf-8"
             }).done(function(data,textStatus,xhr) {
-                RED.notify("Successfully deployed","success");
+                // RED.notify("Successfully deployed","success");
                 RED.nodes.eachNode(function(node) {
                     if (node.changed) {
                         node.dirty = true;

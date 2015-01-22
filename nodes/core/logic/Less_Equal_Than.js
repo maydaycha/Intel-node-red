@@ -13,5 +13,5 @@ module.exports = function(RED) {
             console.log('close!');
         });
     }
-    RED.nodes.registerType("LessThan", ActuatorOut);
+    RED.nodes.registerType("Less Equal Than", ActuatorOut);
 }

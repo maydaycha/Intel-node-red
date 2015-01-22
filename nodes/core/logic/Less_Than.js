@@ -13,5 +13,5 @@ module.exports = function(RED) {
             console.log('close!');
         });
     }
-    RED.nodes.registerType("IASWD_S", ActuatorOut);
+    RED.nodes.registerType("Less Than", ActuatorOut);
 }

@@ -12,5 +12,5 @@ module.exports = function(RED) {
         // this.on('close', function () {
         // });
     }
-    RED.nodes.registerType("IlluminanceMeasurement_S", SensorIn);
+    RED.nodes.registerType("Occupancy Sensor", SensorIn);
 }

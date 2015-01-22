@@ -1,32 +1,33 @@
 <script type="text/javascript">
-    RED.nodes.registerType('LessEqualThan',{
+    RED.nodes.registerType('Normal',{
         category: 'function',
-        color: '#a6bbcf',
+        color:"#fdd0a2",
         defaults: {
-            name: { value:"<=" },
+            name: { value:"@@" },
+            deviceType: {value: "Normal"},
             check: {value: false}
         },
         inputs:1,
-        outputs:2,
-        icon: "light.png",
+        outputs:1,
+        // icon: "light.png",
         label: function() {
-            return this.name || "LessEqualThan";
+            return this.name || "Less Than";
         }
     });
 </script>
 
-<script type="text/x-red" data-template-name="LessEqualThan">
+<script type="text/x-red" data-template-name="Normal">
     <div class="form-row">
         <div class="form-row">
             <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-            <input type="text" id="node-input-name" placeholder="Name" value="<=">
+            <input type="text" id="node-input-name" placeholder="Name" value="<">
         </div>
 
         <input type="hidden" id="node-input-check" value="false">
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="LessEqualThan">
-    <p>A LessEqualThan</p>
+<script type="text/x-red" data-help-name="Normal">
+    <p>A Less Than Operator</p>
 </script>
 
