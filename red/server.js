@@ -139,7 +139,7 @@ function createServer(_server,_settings) {
     });
 
 
-    var flowStorage = []
+    var flowStorage = {}
     var gruopTopic = []
     app.post("/deploy", express.json(), function (request, response) {
         var fileName = localfilesystem.getSaveFlowFilePath();
@@ -153,7 +153,8 @@ function createServer(_server,_settings) {
         var uuid = data.session_id
         console.log("uuid: " + uuid)
 
-        flowStorage.push({"session_id" : uuid, 'flow' : data.flow})
+        // flowStorage.push({"session_id" : uuid, 'flow' : data.flow})
+        flowStorage[uuid] = data.flow
 
         fs.readFile(fileName, "utf8", function (err, oriData) {
             if (err) throw err
@@ -206,7 +207,6 @@ function createServer(_server,_settings) {
                     }
 
                     /** subscribe the finish topic */
-                    // mqttClient.subscribe(topicPrefix + "finish")
                     gruopTopic.push({session_id : uuid, topics : gruopTopicArray})
 
                     console.log(gruopTopic)
@@ -240,18 +240,11 @@ function createServer(_server,_settings) {
                                     console.log("RuleEngine Finish")
 
                                     /** Find the flow with specific session_id */
-                                    for (var i = 0; i < flowStorage.length; i++) {
-                                        if (flowStorage[i].session_id == session_id) {
-                                            try {
-                                                /** redeploy, remove it from flowStorage */
-                                                ws.send(JSON.stringify(flowStorage[i].flow))
-                                                flowStorage.splice(i, 1)
-                                                break
-                                            } catch (e) {
-                                                console.log('[webSocket] send error: ' + e);
-                                            }
-                                        }
+                                    if (session_id in flowStorage) {
+                                        ws.send(JSON.stringify(flowStorage[session_id]))
+                                        delete flowStorage[session_id]
                                     }
+
                                     for (var i = 0; i < gruopTopic.length; i++) {
                                         if (gruopTopic[i].session_id == session_id) {
                                             console.log("unsubscribe topics: " + gruopTopic[i].topics)
