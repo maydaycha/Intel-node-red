@@ -1634,19 +1634,8 @@ RED.view = (function() {
             $("#node-input-export").val(JSON.stringify(nns));
             console.log(JSON.stringify(nns));
 
-            // $("#node-input-export").focus(function() {
-            //         var textarea = $(this);
-            //         textarea.select();
-            //         textarea.mouseup(function() {
-            //                 textarea.unbind("mouseup");
-            //                 return false;
-            //         });
-            // });
-            // $( "#dialog" ).dialog("option","title","Export nodes to clipboard").dialog( "open" );
-            // $("#node-input-export").focus();
-
             /* construct JSON object for mapper */
-            var params = { type: "req", session_id: nns[0].z, flow: nns }
+            var params = { type: "req", session_id: nns[0].z, flow: nns, is_master: true }
             console.log(params);
 
             /* send request to /deploy to fire Mapper for discovery */
@@ -1666,12 +1655,11 @@ RED.view = (function() {
                     if (typeof data.success == 'undefined' || data.success == false) {
                         var oriText = element.text()
                         var failText = 'service unavailable! Will try agian in 5 sec'
-                        console.log(failText)
                         element.html(failText)
                         flag = true
                         setTimeout(function () { $.modal.close() }, 5000);
                     } else {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             var oriText = element.text()
                             element.html("Success!!")
                             setTimeout(function() { location.reload() }, 1000)

@@ -238,9 +238,12 @@ function createServer(_server,_settings) {
 
                                 if (splitArray[3] == 'finish') {
                                     console.log("RuleEngine Finish")
+
+                                    /** Find the flow with specific session_id */
                                     for (var i = 0; i < flowStorage.length; i++) {
                                         if (flowStorage[i].session_id == session_id) {
                                             try {
+                                                /** redeploy, remove it from flowStorage */
                                                 ws.send(JSON.stringify(flowStorage[i].flow))
                                                 flowStorage.splice(i, 1)
                                                 break
