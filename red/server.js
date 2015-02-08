@@ -140,7 +140,7 @@ function createServer(_server,_settings) {
 
 
     var flowStorage = {}
-    var gruopTopic = []
+    var gruopTopic = {}
     app.post("/deploy", express.json(), function (request, response) {
         var fileName = localfilesystem.getSaveFlowFilePath();
         var data = request.body;
@@ -207,19 +207,31 @@ function createServer(_server,_settings) {
                     }
 
                     /** subscribe the finish topic */
-                    gruopTopic.push({session_id : uuid, topics : gruopTopicArray})
+                    // gruopTopic.push({session_id : uuid, topics : gruopTopicArray})
+                    gruopTopic[session_id] = gruopTopicArray
 
                     console.log(gruopTopic)
 
-                    for (var i in gruopTopic) {
-                        for (var j in gruopTopic[i].topics) {
+                    // for (var i in gruopTopic) {
+                    //     for (var j in gruopTopic[i].topics) {
+                    //         /** subscribe the topic for each node */
+                    //         mqttClient.subscribe(gruopTopic[i].topics[j])
+                    //         console.log("mosquitto_pub -h 127.0.0.1 -t " + gruopTopic[i].topics[j] + " -m  'mosquitto'")
+                    //     }
+                    //     /** subscribe the finish topic */
+                    //     mqttClient.subscribe("/formosa/" + gruopTopic[i].session_id + "/finish")
+                    //     console.log("mosquitto_pub -h 127.0.0.1 -t " + "/formosa/" + gruopTopic[i].session_id + "/finish" + " -m  'mosquitto'")
+                    // }
+
+                    for (var key in gruopTopic) {
+                        for (var j in gruopTopic[key]) {
                             /** subscribe the topic for each node */
-                            mqttClient.subscribe(gruopTopic[i].topics[j])
-                            console.log("mosquitto_pub -h 127.0.0.1 -t " + gruopTopic[i].topics[j] + " -m  'mosquitto'")
+                            mqttClient.subscribe(gruopTopic[key][j])
+                            console.log("mosquitto_pub -h 127.0.0.1 -t " + gruopTopic[key][j] + " -m  'mosquitto'")
                         }
                         /** subscribe the finish topic */
-                        mqttClient.subscribe("/formosa/" + gruopTopic[i].session_id + "/finish")
-                        console.log("mosquitto_pub -h 127.0.0.1 -t " + "/formosa/" + gruopTopic[i].session_id + "/finish" + " -m  'mosquitto'")
+                        mqttClient.subscribe("/formosa/" + key + "/finish")
+                        console.log("mosquitto_pub -h 127.0.0.1 -t " + "/formosa/" + key + "/finish" + " -m  'mosquitto'")
                     }
 
                     if (wss === null) wss = new WebSocketServer({ port: 5566 });
@@ -245,14 +257,21 @@ function createServer(_server,_settings) {
                                         delete flowStorage[session_id]
                                     }
 
-                                    for (var i = 0; i < gruopTopic.length; i++) {
-                                        if (gruopTopic[i].session_id == session_id) {
-                                            console.log("unsubscribe topics: " + gruopTopic[i].topics)
-                                            mqttClient.unsubscribe(gruopTopic[i].topics)
-                                            gruopTopic.splice(i, 1)
-                                            break;
-                                        }
+                                    // for (var i = 0; i < gruopTopic.length; i++) {
+                                    //     if (gruopTopic[i].session_id == session_id) {
+                                    //         console.log("unsubscribe topics: " + gruopTopic[i].topics)
+                                    //         mqttClient.unsubscribe(gruopTopic[i].topics)
+                                    //         gruopTopic.splice(i, 1)
+                                    //         break;
+                                    //     }
+                                    // }
+
+                                    if (session_id in gruopTopic) {
+                                        console.log("unsubscribe topics: " + gruopTopic[session_id])
+                                        mqttClient.unsubscribe(gruopTopic[session_id])
+                                        delete gruopTopic[session_id]
                                     }
+
                                 } else {
                                     var nodeId = splitArray[splitArray.length - 1]
                                     try {

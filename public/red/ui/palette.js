@@ -56,9 +56,9 @@ RED.palette = (function() {
           if (def.icon) {
               d.style.backgroundImage = "url(icons/"+def.icon+")";
               if (def.align == "right") {
-                  d.style.backgroundPosition = "95% 50%";
+                  d.style.backgroundPosition = "100% 50%";
               } else if (def.inputs > 0) {
-                  d.style.backgroundPosition = "10% 50%";
+                  d.style.backgroundPosition = "0% 50%";
               }
           }
 
