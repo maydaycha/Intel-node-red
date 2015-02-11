@@ -2,7 +2,7 @@
     RED.nodes.registerType('Power Switch',{
         category: 'output',
         color:"#87a980",
-        icon: "formosa/fi_powersocket.png",
+        icon: "formosa/powersocket2.png",
         align: "right",
         defaults: {
             deviceType: {value: "ONOFF_S"},
@@ -12,7 +12,6 @@
         },
         inputs:0,
         outputs:1,
-        // icon: "light.png",
         label: function() {
             return "Power Switch";
         }
@@ -20,12 +19,24 @@
 </script>
 
 <script type="text/x-red" data-template-name="Power Switch">
-
     <div class="form-row">
-        <label for="node-input-deviceName"><i class="icon-tag"></i>Real Device Name</label>
-        <input type="text" id="node-input-deviceName" disabled>
+        <div>
+            <label class="labelOutput" for="node-input-node-id">ID: </label>
+            <input class="inputOutput" type="text" id="node-input-node-id" disabled></input>
+        </div>
+        <div>
+            <label class="labelOutput" for="node-input-category">Category: </label>
+            <input class="inputOutput" type="text" id="node-input-category" disabled></input>
+        </div>
+        <div>
+            <label class="labelOutput" for="node-input-deviceType">Device Type: </label>
+            <input class="inputOutput" type="text" id="node-input-deviceType" disabled></input>
+        </div>
+        <div>
+           <label class="labelOutput" for="node-input-deviceName">Location: </label>
+           <textarea class="inputOutput" id="node-input-deviceName" disabled></textarea>
+        </div>
     </div>
-
 </script>
 
 <script type="text/x-red" data-help-name="Power Switch">

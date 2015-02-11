@@ -10,7 +10,7 @@
         },
         inputs:1,
         outputs:0,
-        icon: "formosa/fi_temperature.png",
+        icon: "formosa/temperature.png",
         label: function() {
             return this.name || "Temperature Sensor";
         }
@@ -20,8 +20,22 @@
 <script type="text/x-red" data-template-name="Temperature Sensor">
 
     <div class="form-row">
-        <label for="node-input-deviceName"><i class="icon-tag"></i>Real Device Name</label>
-        <input type="text" id="node-input-deviceName" disabled>
+        <div>
+            <label for="node-input-node-id">ID: </label>
+            <input type="text" id="node-input-node-id" disabled></input>
+        </div>
+        <div>
+            <label for="node-input-category">Category: </label>
+            <input type="text" id="node-input-category" disabled></input>
+        </div>
+        <div>
+            <label for="node-input-deviceType">Device Type: </label>
+            <input type="text" id="node-input-deviceType" disabled></input>
+        </div>
+        <div>
+           <label for="node-input-deviceName">Location: </label>
+           <textarea id="node-input-deviceName" disabled></textarea>
+        </div>
     </div>
 
 

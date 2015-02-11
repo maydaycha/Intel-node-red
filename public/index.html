@@ -21,7 +21,7 @@
   limitations under the License.
 -->
 <head>
-<title>Node-RED</title>
+<title>Formosa Island</title>
 <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 <link href="jquery/css/smoothness/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" media="screen">
 <link rel="stylesheet" type="text/css" href="orion/built-editor.css"/>
@@ -33,7 +33,7 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container-fluid">
-            <a class="brand" href="#"><img src="node-red.png"> <span class="red">Node-RED</span> </a>
+            <a class="brand" href="#"><img src="node-red.png"><span class="red">Formosa Island</span></a>
             <div class="btn-group pull-right" style="display: none;">
                 <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-align-justify"></i> <span class="caret"></span></a>
                 <ul class="dropdown-menu">
@@ -73,11 +73,11 @@
                 </ul>
             </div>
             <div class="btn-group pull-right">
-                <a id="btn-deploy" class="btn action-deploy btn-danger" href="#"><i id="btn-icn-deploy" class="icon-upload"></i> Deploy</a>
+                <a id="btn-deploy" class="btn action-deploy btn-danger" href="#"><i id="btn-icn-deploy" class="icon-play"></i> Deploy</a>
 
             </div>
             <div class="btn-group pull-right">
-                <a id="btn-undeploy" class="btn action-deploy" href="#"><i id="btn-icn-deploy" class="icon-upload"></i> UnDeploy</a>
+                <a id="btn-undeploy" class="btn action-deploy" href="#"><i id="btn-icn-deploy" class="icon-stop"></i> UnDeploy</a>
             </div>
             <!-- <div class="btn-group pull-right">
                 <a id="btn-discovery" class="btn action-deploy" href="#"><i id="btn-icn-deploy" class="icon-upload"></i> Discovery</a>
@@ -88,43 +88,48 @@
     </div>
 </div>
 <div id="main-container" class="sidebar-closed">
-    <div id="palette">
-        <img src="spin.svg" class="palette-spinner"/>
-        <div id="palette-container" class="palette-scroll">
+        <!--First Column: Plaette-->
+        <div id="palette">
+            <img src="spin.svg" class="palette-spinner"/>
+                <div id="palette-search">
+                    <i class="icon-search"></i>
+                    <input id="palette-search-input" type="text" placeholder="Search">
+                        <a href="#" id="palette-search-clear"><i class="icon-remove"></i></a>
+                    </input>
+                </div><br/>
+                <div id="palette-container" class="palette-scroll"></div>
         </div>
-        <div id="palette-search">
-            <i class="icon-search"></i><input id="palette-search-input" type="text" placeholder="filter"><a href="#" id="palette-search-clear"><i class="icon-remove"></i></a></input>
-        </div>
-    </div><!-- /palette -->
 
-    <div id="workspace">
-        <ul id="workspace-tabs"></ul>
-        <div id="workspace-add-tab"><a id="btn-workspace-add-tab" href="#"><i class="icon-plus"></i></a></div>
-        <div id="chart"></div>
-        <div id="workspace-toolbar">
-            <div class="btn-group">
-                <a class="btn btn-small" href="#"><i class="icon-zoom-out"></i></a>
-                <a class="btn btn-small" href="#"><i class="icon-th"></i></a>
-                <a class="btn btn-small" href="#"><i class="icon-zoom-in"></i></a>
+	<!--Second Column: Workspace-->
+
+        <div id="workspace">
+            <ul id="workspace-tabs"></ul>
+            <div id="workspace-add-tab"><a id="btn-workspace-add-tab" href="#"><i class="icon-plus"></i></a></div>
+            <div id="chart"></div>
+            <div id="workspace-toolbar">
+                <div class="btn-group">
+                    <a class="btn btn-small" href="#"><i class="icon-zoom-out"></i></a>
+                    <a class="btn btn-small" href="#"><i class="icon-th"></i></a>
+                    <a class="btn btn-small" href="#"><i class="icon-zoom-in"></i></a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="chart-zoom-controls">
-        <div class="btn-group">
-            <a class="btn btn-mini" id="btn-zoom-out" href="#"><i class="icon-zoom-out"></i></a>
-            <a class="btn btn-mini" id="btn-zoom-zero" href="#"><i class="icon-th"></i></a>
-            <a class="btn btn-mini" id="btn-zoom-in" href="#"><i class="icon-zoom-in"></i></a>
+	<!--Third Column: Info Undeploy-->
+        <!--<div id="chart-zoom-controls">
+            <div class="btn-group">
+                <a class="btn btn-mini" id="btn-zoom-out" href="#"><i class="icon-zoom-out"></i></a>
+                <a class="btn btn-mini" id="btn-zoom-zero" href="#"><i class="icon-th"></i></a>
+                <a class="btn btn-mini" id="btn-zoom-in" href="#"><i class="icon-zoom-in"></i></a>
+            </div>
         </div>
-    </div>
 
-    <div id="sidebar">
-        <ul id="sidebar-tabs"></ul>
-        <div id="sidebar-content"></div>
-    </div>
+        <div id="sidebar">
+            <ul id="sidebar-tabs"></ul>
+            <div id="sidebar-content"></div>
+        </div>
 
-    <div id="sidebar-separator"></div>
-
+        <div id="sidebar-separator"></div>-->
 </div>
 
 <div id="notifications"></div>

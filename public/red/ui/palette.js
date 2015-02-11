@@ -64,7 +64,8 @@ RED.palette = (function() {
 
           d.style.backgroundColor = def.color;
 
-          if (def.outputs > 0) {
+          /** Uncomment def.output to remove port icon from UI **/
+          /*if (def.outputs > 0) {
               var portOut = document.createElement("div");
               portOut.className = "palette_port palette_port_output";
               d.appendChild(portOut);
@@ -74,7 +75,7 @@ RED.palette = (function() {
               var portIn = document.createElement("div");
               portIn.className = "palette_port";
               d.appendChild(portIn);
-          }
+          }*/
 
           if ($("#palette-base-category-"+category[0]).length === 0){
               createCategoryContainer(category[0]);

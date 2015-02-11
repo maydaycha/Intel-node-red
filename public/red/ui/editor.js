@@ -457,7 +457,8 @@ RED.editor = (function() {
         RED.view.state(RED.state.EDITING);
         $("#dialog-form").html($("script[data-template-name='"+node.type+"']").html());
         prepareEditDialog(node,node._def,"node-input");
-        $( "#dialog" ).dialog("option","title","Edit "+node.type+" node").dialog( "open" );
+        //$( "#dialog" ).dialog("option","title","Edit "+node.type+" node").dialog( "open" );
+        $( "#dialog" ).dialog("option","title","Node: "+node.type).dialog( "open" );
     }
 
     function showEditConfigNodeDialog(name,type,id) {

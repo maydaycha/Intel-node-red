@@ -1654,7 +1654,7 @@ RED.view = (function() {
 
                     if (typeof data.success == 'undefined' || data.success == false) {
                         var oriText = element.text()
-                        var failText = 'service unavailable! Will try agian in 5 sec'
+                        var failText = 'Service is unavailable! Will try again in 5 sec'
                         element.html(failText)
                         flag = true
                         setTimeout(function () { $.modal.close() }, 5000);
