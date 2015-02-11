@@ -208,7 +208,7 @@ function createServer(_server,_settings) {
 
                     /** subscribe the finish topic */
                     // gruopTopic.push({session_id : uuid, topics : gruopTopicArray})
-                    gruopTopic[session_id] = gruopTopicArray
+                    gruopTopic[uuid] = gruopTopicArray
 
                     console.log(gruopTopic)
 

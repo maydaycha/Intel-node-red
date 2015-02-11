@@ -262,11 +262,10 @@ var RED = (function() {
             console.log('socket disconnected')
         }
         socketClient.onmessage = function (event) {
-            // var data = JSON.parse(event.data);
             console.log(event.data)
             try {
                 var flow = JSON.parse(event.data);
-                console.log('[timeput] re deploy')
+                console.log('[timeout] re-deploy')
                 console.log(flow)
 
                 /** re-deploy */
@@ -290,7 +289,7 @@ var RED = (function() {
                                 console.log("********** redeploy ************")
                                 RED.view.showExportNodesDialog(flow);
                             }, 7000, flow)
-                            // RED.view.showExportNodesDialog(flow);
+
                             // location.reload()
                         }
                     });
