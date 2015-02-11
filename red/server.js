@@ -139,8 +139,8 @@ function createServer(_server,_settings) {
     });
 
 
-    var flowStorage = {}
-    var gruopTopic = {}
+    var flowStorage = []
+    var gruopTopic = []
     app.post("/deploy", express.json(), function (request, response) {
         var fileName = localfilesystem.getSaveFlowFilePath();
         var data = request.body;
@@ -153,8 +153,7 @@ function createServer(_server,_settings) {
         var uuid = data.session_id
         console.log("uuid: " + uuid)
 
-        // flowStorage.push({"session_id" : uuid, 'flow' : data.flow})
-        flowStorage[uuid] = data.flow
+        flowStorage.push({"session_id" : uuid, 'flow' : data.flow})
 
         fs.readFile(fileName, "utf8", function (err, oriData) {
             if (err) throw err
@@ -207,31 +206,20 @@ function createServer(_server,_settings) {
                     }
 
                     /** subscribe the finish topic */
-                    // gruopTopic.push({session_id : uuid, topics : gruopTopicArray})
-                    gruopTopic[session_id] = gruopTopicArray
+                    // mqttClient.subscribe(topicPrefix + "finish")
+                    gruopTopic.push({session_id : uuid, topics : gruopTopicArray})
 
                     console.log(gruopTopic)
 
-                    // for (var i in gruopTopic) {
-                    //     for (var j in gruopTopic[i].topics) {
-                    //         /** subscribe the topic for each node */
-                    //         mqttClient.subscribe(gruopTopic[i].topics[j])
-                    //         console.log("mosquitto_pub -h 127.0.0.1 -t " + gruopTopic[i].topics[j] + " -m  'mosquitto'")
-                    //     }
-                    //     /** subscribe the finish topic */
-                    //     mqttClient.subscribe("/formosa/" + gruopTopic[i].session_id + "/finish")
-                    //     console.log("mosquitto_pub -h 127.0.0.1 -t " + "/formosa/" + gruopTopic[i].session_id + "/finish" + " -m  'mosquitto'")
-                    // }
-
-                    for (var key in gruopTopic) {
-                        for (var j in gruopTopic[key]) {
+                    for (var i in gruopTopic) {
+                        for (var j in gruopTopic[i].topics) {
                             /** subscribe the topic for each node */
-                            mqttClient.subscribe(gruopTopic[key][j])
-                            console.log("mosquitto_pub -h 127.0.0.1 -t " + gruopTopic[key][j] + " -m  'mosquitto'")
+                            mqttClient.subscribe(gruopTopic[i].topics[j])
+                            console.log("mosquitto_pub -h 127.0.0.1 -t " + gruopTopic[i].topics[j] + " -m  'mosquitto'")
                         }
                         /** subscribe the finish topic */
-                        mqttClient.subscribe("/formosa/" + key + "/finish")
-                        console.log("mosquitto_pub -h 127.0.0.1 -t " + "/formosa/" + key + "/finish" + " -m  'mosquitto'")
+                        mqttClient.subscribe("/formosa/" + gruopTopic[i].session_id + "/finish")
+                        console.log("mosquitto_pub -h 127.0.0.1 -t " + "/formosa/" + gruopTopic[i].session_id + "/finish" + " -m  'mosquitto'")
                     }
 
                     if (wss === null) wss = new WebSocketServer({ port: 5566 });
@@ -252,26 +240,26 @@ function createServer(_server,_settings) {
                                     console.log("RuleEngine Finish")
 
                                     /** Find the flow with specific session_id */
-                                    if (session_id in flowStorage) {
-                                        ws.send(JSON.stringify(flowStorage[session_id]))
-                                        delete flowStorage[session_id]
+                                    for (var i = 0; i < flowStorage.length; i++) {
+                                        if (flowStorage[i].session_id == session_id) {
+                                            try {
+                                                /** redeploy, remove it from flowStorage */
+                                                ws.send(JSON.stringify(flowStorage[i].flow))
+                                                flowStorage.splice(i, 1)
+                                                break
+                                            } catch (e) {
+                                                console.log('[webSocket] send error: ' + e);
+                                            }
+                                        }
                                     }
-
-                                    // for (var i = 0; i < gruopTopic.length; i++) {
-                                    //     if (gruopTopic[i].session_id == session_id) {
-                                    //         console.log("unsubscribe topics: " + gruopTopic[i].topics)
-                                    //         mqttClient.unsubscribe(gruopTopic[i].topics)
-                                    //         gruopTopic.splice(i, 1)
-                                    //         break;
-                                    //     }
-                                    // }
-
-                                    if (session_id in gruopTopic) {
-                                        console.log("unsubscribe topics: " + gruopTopic[session_id])
-                                        mqttClient.unsubscribe(gruopTopic[session_id])
-                                        delete gruopTopic[session_id]
+                                    for (var i = 0; i < gruopTopic.length; i++) {
+                                        if (gruopTopic[i].session_id == session_id) {
+                                            console.log("unsubscribe topics: " + gruopTopic[i].topics)
+                                            mqttClient.unsubscribe(gruopTopic[i].topics)
+                                            gruopTopic.splice(i, 1)
+                                            break;
+                                        }
                                     }
-
                                 } else {
                                     var nodeId = splitArray[splitArray.length - 1]
                                     try {
